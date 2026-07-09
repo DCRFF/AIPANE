@@ -9,6 +9,8 @@ const api = {
   removePanel: (id: string): Promise<AppSettings> => ipcRenderer.invoke('panel:remove', id),
   navigate: (id: string, url: string): Promise<AppSettings> =>
     ipcRenderer.invoke('panel:navigate', id, url),
+  renamePanel: (id: string, name: string): Promise<AppSettings> =>
+    ipcRenderer.invoke('panel:rename', id, name),
   goBack: (id: string): Promise<void> => ipcRenderer.invoke('panel:goBack', id),
   goForward: (id: string): Promise<void> => ipcRenderer.invoke('panel:goForward', id),
   reload: (id: string): Promise<void> => ipcRenderer.invoke('panel:reload', id),

@@ -12,8 +12,10 @@
     .section { margin-bottom: 20px; }
     input[type="text"] { width: 100%; padding: 8px 12px; background: #374151; color: #fff; border: none; border-radius: 4px; font-size: 13px; }
     input[type="text"]:focus { outline: none; box-shadow: 0 0 0 1px #3b82f6; }
-    .panel-row { margin-bottom: 8px; }
-    .panel-row .label { font-size: 11px; color: #6b7280; margin-bottom: 4px; }
+    .panel-row { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #374151; }
+    .panel-row:last-child { border-bottom: 0; }
+    .name-row { display: flex; align-items: center; margin-bottom: 4px; }
+    .name-row .label { font-size: 11px; color: #6b7280; white-space: nowrap; }
     .btn { padding: 6px 12px; background: #374151; color: #fff; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; }
     .btn:hover { background: #4b5563; }
     .btn:disabled { opacity: 0.3; cursor: default; }
@@ -26,14 +28,11 @@
 
   <div class="section">
     <label>面板数量 (<span id="count">2</span>/6)</label>
-    <div class="btn-row">
-      <button class="btn" id="addBtn">+</button>
-      <button class="btn" id="removeBtn">-</button>
-    </div>
+    <button class="btn" id="addBtn">+</button>
   </div>
 
   <div class="section">
-    <label>面板 URL</label>
+    <label>面板配置</label>
     <div id="urls"></div>
   </div>
 

@@ -68,6 +68,16 @@ export function registerIpc(mainWindow: BrowserWindow): void {
     goForwardView(id);
   });
 
+  ipcMain.handle('panel:rename', (_event, id: string, name: string) => {
+    settings = {
+      ...settings,
+      panels: settings.panels.map((p) => (p.id === id ? { ...p, name } : p)),
+    };
+    saveSettings(settings);
+    broadcast();
+    return settings;
+  });
+
   ipcMain.handle('panel:reload', (_event, id: string) => {
     reloadView(id);
   });

@@ -21,21 +21,31 @@ export default function SettingsPanel({ onClose }: Props) {
     panels.forEach((p) => (map[p.id] = p.url));
     return map;
   });
+  const [localNames, setLocalNames] = useState<Record<string, string>>(() => {
+    const map: Record<string, string> = {};
+    panels.forEach((p) => (map[p.id] = p.name));
+    return map;
+  });
 
   const handleUrlChange = (id: string, url: string) => {
     setLocalUrls((prev) => ({ ...prev, [id]: url }));
     window.api.navigate(id, url).then(setSettingsFromMain);
   };
 
-  const handleAdd = async () => {
-    if (panels.length >= 6) return;
-    const s = await window.api.addPanel('about:blank');
-    setSettingsFromMain(s);
+  const handleNameChange = (id: string, name: string) => {
+    setLocalNames((prev) => ({ ...prev, [id]: name }));
+    window.api.renamePanel(id, name).then(setSettingsFromMain);
   };
 
   const handleRemove = async (id: string) => {
     if (panels.length <= 1) return;
     const s = await window.api.removePanel(id);
+    setSettingsFromMain(s);
+  };
+
+  const handleAdd = async () => {
+    if (panels.length >= 6) return;
+    const s = await window.api.addPanel('about:blank');
     setSettingsFromMain(s);
   };
 
@@ -45,11 +55,7 @@ export default function SettingsPanel({ onClose }: Props) {
       layoutMode: mode,
       panelRatios: panels.map(() => 1 / panels.length),
     });
-    setSettingsFromMain({
-      panels,
-      layoutMode: mode,
-      panelRatios: panels.map(() => 1 / panels.length),
-    });
+    setSettingsFromMain({ panels, layoutMode: mode, panelRatios: panels.map(() => 1 / panels.length) });
   };
 
   return (
@@ -61,18 +67,25 @@ export default function SettingsPanel({ onClose }: Props) {
 
       <div className="mb-6">
         <label className="block text-sm text-gray-400 mb-2">面板数量 ({panels.length}/6)</label>
-        <div className="flex gap-2">
-          <button onClick={handleAdd} disabled={panels.length >= 6} className="px-3 py-1 bg-gray-700 text-white rounded disabled:opacity-30">+</button>
-          <button onClick={() => { const last = panels[panels.length - 1]; if (last) handleRemove(last.id); }} disabled={panels.length <= 1} className="px-3 py-1 bg-gray-700 text-white rounded disabled:opacity-30">-</button>
-        </div>
+        <button onClick={handleAdd} disabled={panels.length >= 6} className="px-3 py-1 bg-gray-700 text-white rounded disabled:opacity-30">+</button>
       </div>
 
       <div className="mb-6">
-        <label className="block text-sm text-gray-400 mb-2">面板 URL</label>
+        <label className="block text-sm text-gray-400 mb-2">面板配置</label>
         {panels.map((panel, i) => (
-          <div key={panel.id} className="mb-2">
-            <div className="text-xs text-gray-500 mb-1">面板 {i + 1}</div>
-            <input type="text" value={localUrls[panel.id] ?? panel.url} onChange={(e) => handleUrlChange(panel.id, e.target.value)} className="w-full px-3 py-2 bg-gray-700 text-white rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          <div key={panel.id} className="mb-3 pb-3 border-b border-gray-700 last:border-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs text-gray-500">面板 {i + 1}</span>
+              <input
+                type="text"
+                value={localNames[panel.id] ?? panel.name}
+                onChange={(e) => handleNameChange(panel.id, e.target.value)}
+                className="flex-1 px-2 py-1 bg-gray-700 text-white text-xs rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="名称"
+              />
+              <button onClick={() => handleRemove(panel.id)} disabled={panels.length <= 1} className="px-2 py-1 text-xs text-gray-400 hover:text-red-400 disabled:opacity-30 shrink-0">✕</button>
+            </div>
+            <input type="text" value={localUrls[panel.id] ?? panel.url} onChange={(e) => handleUrlChange(panel.id, e.target.value)} className="w-full px-3 py-2 bg-gray-700 text-white rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="URL" />
           </div>
         ))}
       </div>

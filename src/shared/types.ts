@@ -1,6 +1,7 @@
 /** 面板配置 */
 export interface PanelConfig {
   id: string;
+  name: string;
   url: string;
   zoom?: number;
 }
@@ -34,8 +35,9 @@ export type IpcChannel =
 export interface BrowserApi {
   getSettings(): Promise<AppSettings>;
   updateSettings(settings: AppSettings): Promise<void>;
-  addPanel(url: string): Promise<AppSettings>;
   removePanel(id: string): Promise<AppSettings>;
+  renamePanel(id: string, name: string): Promise<AppSettings>;
+  navigate(id: string, url: string): Promise<AppSettings>;
   goForward(id: string): Promise<void>;
   reload(id: string): Promise<void>;
   toggleSettings(): Promise<void>;

@@ -16,7 +16,6 @@ async function refresh() {
   renderUrls();
   renderLayoutBtns();
   document.getElementById('addBtn').disabled = panels.length >= 6;
-  document.getElementById('removeBtn').disabled = panels.length <= 1;
 }
 
 function renderUrls() {
@@ -24,16 +23,40 @@ function renderUrls() {
   panels.forEach((p, i) => {
     const div = document.createElement('div');
     div.className = 'panel-row';
-    div.innerHTML = `<div class="label">面板 ${i + 1}</div>`;
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = p.url;
-    input.addEventListener('change', () => {
-      window.api.navigate(p.id, input.value.trim()).then((s) => {
-        panels = s.panels;
-      });
+
+    // Name row
+    const nameRow = document.createElement('div');
+    nameRow.className = 'name-row';
+    nameRow.innerHTML = `<span class="label">面板 ${i + 1}</span>`;
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.value = p.name || '';
+    nameInput.style.cssText = 'flex:1;margin:0 4px;font-size:12px;padding:4px 8px';
+    nameInput.placeholder = '名称';
+    nameInput.addEventListener('change', () => {
+      window.api.renamePanel(p.id, nameInput.value.trim());
     });
-    div.appendChild(input);
+    nameRow.appendChild(nameInput);
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = '✕';
+    removeBtn.style.cssText = 'padding:2px 6px;font-size:12px;background:none;border:none;color:#9ca3af;cursor:pointer';
+    removeBtn.disabled = panels.length <= 1;
+    removeBtn.addEventListener('click', async () => {
+      if (panels.length <= 1) return;
+      const s = await window.api.removePanel(p.id);
+      panels = s.panels;
+      refresh();
+    });
+    nameRow.appendChild(removeBtn);
+    div.appendChild(nameRow);
+
+    const urlInput = document.createElement('input');
+    urlInput.type = 'text';
+    urlInput.value = p.url;
+    urlInput.addEventListener('change', () => {
+      window.api.navigate(p.id, urlInput.value.trim()).then((s) => { panels = s.panels; });
+    });
+    div.appendChild(urlInput);
     $urls.appendChild(div);
   });
 }
@@ -60,12 +83,6 @@ document.getElementById('closeBtn').addEventListener('click', () => {
 document.getElementById('addBtn').addEventListener('click', async () => {
   if (panels.length >= 6) return;
   const s = await window.api.addPanel('about:blank');
-  refresh();
-});
-
-document.getElementById('removeBtn').addEventListener('click', async () => {
-  if (panels.length <= 1) return;
-  const s = await window.api.removePanel(panels[panels.length - 1].id);
   panels = s.panels;
   refresh();
 });

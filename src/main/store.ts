@@ -12,8 +12,8 @@ const store = new Store<{ settings: AppSettings; windowState: WindowState }>({
   defaults: {
     settings: {
       panels: [
-        { id: uuid(), url: 'https://www.doubao.com/' },
-        { id: uuid(), url: 'https://chat.deepseek.com/' },
+        { id: uuid(), name: '豆包', url: 'https://www.doubao.com/' },
+        { id: uuid(), name: 'DeepSeek', url: 'https://chat.deepseek.com/' },
       ],
       layoutMode: 'horizontal' as const,
     },
