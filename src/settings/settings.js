@@ -1,16 +1,22 @@
 let panels = [];
-let layoutDirection = 'horizontal';
+let layoutMode = 'horizontal';
+
+const LAYOUT_MODES = [
+  { value: 'horizontal', label: '横向' },
+  { value: 'vertical', label: '纵向' },
+  { value: 'grid', label: '田字' },
+];
 
 const $count = document.getElementById('count');
 const $urls = document.getElementById('urls');
-const $layoutBtn = document.getElementById('layoutBtn');
+const $layoutBtns = document.getElementById('layoutBtns');
 
 async function refresh() {
   $count.textContent = panels.length;
-  $layoutBtn.textContent = layoutDirection === 'horizontal' ? '横向 → 纵向' : '纵向 → 横向';
   renderUrls();
-  document.getElementById('addBtn').disabled = panels.length >= 5;
-  document.getElementById('removeBtn').disabled = panels.length <= 2;
+  renderLayoutBtns();
+  document.getElementById('addBtn').disabled = panels.length >= 6;
+  document.getElementById('removeBtn').disabled = panels.length <= 1;
 }
 
 function renderUrls() {
@@ -25,11 +31,25 @@ function renderUrls() {
     input.addEventListener('change', () => {
       window.api.navigate(p.id, input.value.trim()).then((s) => {
         panels = s.panels;
-        p.url = input.value.trim();
       });
     });
     div.appendChild(input);
     $urls.appendChild(div);
+  });
+}
+
+function renderLayoutBtns() {
+  $layoutBtns.innerHTML = '';
+  LAYOUT_MODES.forEach((m) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn' + (layoutMode === m.value ? ' active' : '');
+    btn.textContent = m.label;
+    btn.addEventListener('click', async () => {
+      await window.api.updateSettings({ panels, layoutMode: m.value, panelRatios: panels.map(() => 1 / panels.length) });
+      layoutMode = m.value;
+      refresh();
+    });
+    $layoutBtns.appendChild(btn);
   });
 }
 
@@ -38,29 +58,21 @@ document.getElementById('closeBtn').addEventListener('click', () => {
 });
 
 document.getElementById('addBtn').addEventListener('click', async () => {
-  if (panels.length >= 5) return;
+  if (panels.length >= 6) return;
   const s = await window.api.addPanel('https://chat.deepseek.com/');
   panels = s.panels;
   refresh();
 });
 
 document.getElementById('removeBtn').addEventListener('click', async () => {
-  if (panels.length <= 2) return;
+  if (panels.length <= 1) return;
   const s = await window.api.removePanel(panels[panels.length - 1].id);
   panels = s.panels;
   refresh();
 });
 
-document.getElementById('layoutBtn').addEventListener('click', async () => {
-  const newDir = layoutDirection === 'horizontal' ? 'vertical' : 'horizontal';
-  await window.api.updateSettings({ panels, layoutDirection: newDir, panelRatios: panels.map(() => 1 / panels.length) });
-  layoutDirection = newDir;
-  refresh();
-});
-
-// init
 window.api.getSettings().then((s) => {
   panels = s.panels;
-  layoutDirection = s.layoutDirection;
+  layoutMode = s.layoutMode;
   refresh();
 });

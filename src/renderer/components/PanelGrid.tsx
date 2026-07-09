@@ -5,21 +5,23 @@ import PanelSlot from './PanelSlot';
 export default function PanelGrid() {
   const panels = useLayoutStore((s) => s.panels);
   const panelRatios = useLayoutStore((s) => s.panelRatios);
-  const layoutDirection = useLayoutStore((s) => s.layoutDirection);
+  const layoutMode = useLayoutStore((s) => s.layoutMode);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const handleDragStart = useCallback(
     (index: number) => (e: React.MouseEvent) => {
       e.preventDefault();
       const grid = gridRef.current;
-      if (!grid || panels.length < 2) return;
+      if (!grid || panels.length < 2 || layoutMode === 'grid') return;
 
-      const startPos = layoutDirection === 'horizontal' ? e.clientX : e.clientY;
+      const startPos = layoutMode === 'horizontal' ? e.clientX : e.clientY;
       const totalSize =
-        layoutDirection === 'horizontal' ? grid.getBoundingClientRect().width : grid.getBoundingClientRect().height;
+        layoutMode === 'horizontal'
+          ? grid.getBoundingClientRect().width
+          : grid.getBoundingClientRect().height;
 
       const onMove = (ev: MouseEvent) => {
-        const currentPos = layoutDirection === 'horizontal' ? ev.clientX : ev.clientY;
+        const currentPos = layoutMode === 'horizontal' ? ev.clientX : ev.clientY;
         const delta = currentPos - startPos;
         const deltaRatio = delta / totalSize;
 
@@ -42,22 +44,28 @@ export default function PanelGrid() {
       document.addEventListener('mousemove', onMove);
       document.addEventListener('mouseup', onUp);
     },
-    [panels.length, panelRatios, layoutDirection],
+    [panels.length, panelRatios, layoutMode],
   );
+
+  const cols = Math.ceil(Math.sqrt(panels.length));
 
   return (
     <div
       ref={gridRef}
-      className="flex-1 flex"
-      style={{ flexDirection: layoutDirection === 'horizontal' ? 'row' : 'column' }}
+      className="flex-1"
+      style={{
+        display: layoutMode === 'grid' ? 'grid' : 'flex',
+        flexDirection: layoutMode === 'vertical' ? 'column' : 'row',
+        gridTemplateColumns: layoutMode === 'grid' ? `repeat(${cols}, 1fr)` : undefined,
+      }}
     >
       {panels.map((panel, i) => (
-        <div key={panel.id} className="flex" style={{ flex: panelRatios[i] ?? 1 / panels.length }}>
+        <div key={panel.id} className="flex" style={layoutMode !== 'grid' ? { flex: panelRatios[i] ?? 1 / panels.length } : undefined}>
           <PanelSlot panelId={panel.id} />
-          {i < panels.length - 1 && (
+          {i < panels.length - 1 && layoutMode !== 'grid' && (
             <div
-              className={`shrink-0 bg-gray-600 hover:bg-blue-500 cursor-col-resize transition-colors ${
-                layoutDirection === 'horizontal' ? 'w-1 cursor-col-resize' : 'h-1 cursor-row-resize'
+              className={`shrink-0 bg-gray-600 hover:bg-blue-500 transition-colors ${
+                layoutMode === 'horizontal' ? 'w-1 cursor-col-resize' : 'h-1 cursor-row-resize'
               }`}
               onMouseDown={handleDragStart(i)}
             />

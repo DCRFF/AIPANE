@@ -17,14 +17,15 @@
     .btn { padding: 6px 12px; background: #374151; color: #fff; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; }
     .btn:hover { background: #4b5563; }
     .btn:disabled { opacity: 0.3; cursor: default; }
-    .btn-row { display: flex; gap: 8px; }
+    .btn.active { background: #2563eb; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
   </style>
 </head>
 <body>
   <h2>设置 <button id="closeBtn">✕</button></h2>
 
   <div class="section">
-    <label>面板数量 (<span id="count">2</span>/5)</label>
+    <label>面板数量 (<span id="count">2</span>/6)</label>
     <div class="btn-row">
       <button class="btn" id="addBtn">+</button>
       <button class="btn" id="removeBtn">-</button>
@@ -37,8 +38,8 @@
   </div>
 
   <div class="section">
-    <label>布局方向</label>
-    <button class="btn" id="layoutBtn">横向 → 纵向</button>
+    <label>布局方式</label>
+    <div class="btn-row" id="layoutBtns"></div>
   </div>
 
   <script src="./settings.js"></script>

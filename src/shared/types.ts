@@ -8,7 +8,7 @@ export interface PanelConfig {
 /** 应用设置 */
 export interface AppSettings {
   panels: PanelConfig[];
-  layoutDirection: 'horizontal' | 'vertical';
+  layoutMode: 'horizontal' | 'vertical' | 'grid';
   panelRatios: number[];
 }
 

@@ -46,15 +46,13 @@ export function applyLayout(settings: AppSettings, mainWindow: BrowserWindow): v
   const toolbarHeight = 48;
   const availableWidth = contentBounds.width;
   const availableHeight = contentBounds.height - toolbarHeight;
-  const { panels, panelRatios, layoutDirection } = settings;
+  const { panels, panelRatios, layoutMode } = settings;
 
-  panels.forEach((panel, i) => {
-    const view = views.get(panel.id);
-    if (!view) return;
-
-    const ratio = panelRatios[i] ?? 1 / panels.length;
-
-    if (layoutDirection === 'horizontal') {
+  if (layoutMode === 'horizontal') {
+    panels.forEach((panel, i) => {
+      const view = views.get(panel.id);
+      if (!view) return;
+      const ratio = panelRatios[i] ?? 1 / panels.length;
       const x = panelRatios.slice(0, i).reduce((sum, r) => sum + r, 0) * availableWidth;
       view.setBounds({
         x: Math.round(x),
@@ -62,7 +60,12 @@ export function applyLayout(settings: AppSettings, mainWindow: BrowserWindow): v
         width: Math.round(availableWidth * ratio),
         height: availableHeight,
       });
-    } else {
+    });
+  } else if (layoutMode === 'vertical') {
+    panels.forEach((panel, i) => {
+      const view = views.get(panel.id);
+      if (!view) return;
+      const ratio = panelRatios[i] ?? 1 / panels.length;
       const y = panelRatios.slice(0, i).reduce((sum, r) => sum + r, 0) * availableHeight + toolbarHeight;
       view.setBounds({
         x: 0,
@@ -70,8 +73,27 @@ export function applyLayout(settings: AppSettings, mainWindow: BrowserWindow): v
         width: availableWidth,
         height: Math.round(availableHeight * ratio),
       });
-    }
-  });
+    });
+  } else {
+    // grid
+    const count = panels.length;
+    const cols = Math.ceil(Math.sqrt(count));
+    const rows = Math.ceil(count / cols);
+    const cellW = Math.round(availableWidth / cols);
+    const cellH = Math.round(availableHeight / rows);
+    panels.forEach((panel, i) => {
+      const view = views.get(panel.id);
+      if (!view) return;
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      view.setBounds({
+        x: col * cellW,
+        y: row * cellH + toolbarHeight,
+        width: cellW,
+        height: cellH,
+      });
+    });
+  }
 }
 
 export function addPanelAndSave(config: PanelConfig, settings: AppSettings, mainWindow: BrowserWindow): AppSettings {
