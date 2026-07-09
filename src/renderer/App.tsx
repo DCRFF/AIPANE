@@ -1,54 +1,30 @@
 import { useEffect } from 'react';
-import Toolbar from './components/Toolbar';
 import PanelGrid from './components/PanelGrid';
 import { useLayoutStore } from './store';
-import { useLayout } from './hooks/useLayout';
 
 export default function App() {
   const setSettings = useLayoutStore((s) => s.setSettings);
   const panels = useLayoutStore((s) => s.panels);
 
   useEffect(() => {
-    window.api.getSettings().then((settings) => {
-      setSettings(settings);
-    });
+    window.api.getSettings().then(setSettings);
   }, [setSettings]);
-  // 监听设置窗口的变更
+
   useEffect(() => {
-    window.api.onSettingsChanged((settings) => {
-      setSettings(settings);
-    });
+    window.api.onSettingsChanged(setSettings);
   }, [setSettings]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (!e.ctrlKey && !e.metaKey) return;
-      switch (e.key) {
-        case 't':
-          e.preventDefault();
-          window.api.addPanel('about:blank').then(setSettings);
-          break;
-        case 'w':
-          e.preventDefault();
-          if (panels.length > 2) {
-            window.api.removePanel(panels[panels.length - 1].id).then(setSettings);
-          }
-          break;
-        case 'l':
-          e.preventDefault();
-          document.querySelector<HTMLInputElement>('input[type="text"]')?.focus();
-          break;
-      }
+      if (e.key === 't') { e.preventDefault(); window.api.addPanel('about:blank').then(setSettings); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [panels, setSettings]);
-
-  useLayout();
+  }, [setSettings]);
 
   return (
     <div className="h-screen flex flex-col bg-gray-900">
-      <Toolbar />
       <PanelGrid />
     </div>
   );

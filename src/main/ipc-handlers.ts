@@ -2,17 +2,7 @@ import { ipcMain, BrowserWindow } from 'electron';
 import path from 'path';
 import { v4 as uuid } from 'uuid';
 import { loadSettings, saveSettings, loadWindowState, saveWindowState } from './store.js';
-import {
-  createAllViews,
-  addPanelAndSave,
-  removePanelAndSave,
-  navigateAndSave,
-  applyLayout,
-  goBackView,
-  goForwardView,
-  reloadView,
-} from './view-manager.js';
-import type { AppSettings, PanelConfig, LayoutItem } from '../shared/types.js';
+import type { AppSettings, PanelConfig } from '../shared/types.js';
 
 export function registerIpc(mainWindow: BrowserWindow): void {
   let settings = loadSettings();
@@ -31,55 +21,41 @@ export function registerIpc(mainWindow: BrowserWindow): void {
 
   ipcMain.handle('settings:get', () => settings);
 
-  ipcMain.handle('settings:update', (_event, newSettings: AppSettings) => {
-    settings = { ...newSettings };
+  ipcMain.handle('settings:update', (_event, s: AppSettings) => {
+    settings = { ...s };
     saveSettings(settings);
-    applyLayout(settings, mainWindow);
     broadcast();
   });
 
   ipcMain.handle('panel:add', (_event, url: string) => {
-    const config: PanelConfig = { id: uuid(), url };
-    settings = addPanelAndSave(config, settings, mainWindow);
+    const id = uuid();
+    const name = `面板 ${settings.panels.length + 1}`;
+    settings = { ...settings, panels: [...settings.panels, { id, name, url }], panelRatios: settings.panels.map(() => 1 / (settings.panels.length + 1)) };
     saveSettings(settings);
     broadcast();
     return settings;
   });
 
   ipcMain.handle('panel:remove', (_event, id: string) => {
-    settings = removePanelAndSave(id, settings, mainWindow);
+    const newPanels = settings.panels.filter((p) => p.id !== id);
+    settings = { ...settings, panels: newPanels, panelRatios: newPanels.map(() => 1 / newPanels.length) };
     saveSettings(settings);
     broadcast();
     return settings;
   });
 
   ipcMain.handle('panel:navigate', (_event, id: string, url: string) => {
-    settings = navigateAndSave(id, url, settings);
+    settings = { ...settings, panels: settings.panels.map((p) => (p.id === id ? { ...p, url } : p)) };
     saveSettings(settings);
     broadcast();
     return settings;
-  });
-
-  ipcMain.handle('panel:goBack', (_event, id: string) => {
-    goBackView(id);
-  });
-
-  ipcMain.handle('panel:goForward', (_event, id: string) => {
-    goForwardView(id);
   });
 
   ipcMain.handle('panel:rename', (_event, id: string, name: string) => {
-    settings = {
-      ...settings,
-      panels: settings.panels.map((p) => (p.id === id ? { ...p, name } : p)),
-    };
+    settings = { ...settings, panels: settings.panels.map((p) => (p.id === id ? { ...p, name } : p)) };
     saveSettings(settings);
     broadcast();
     return settings;
-  });
-
-  ipcMain.handle('panel:reload', (_event, id: string) => {
-    reloadView(id);
   });
 
   ipcMain.handle('settings:toggle', () => {
@@ -89,8 +65,7 @@ export function registerIpc(mainWindow: BrowserWindow): void {
       return;
     }
     const { x: cx, y: cy, width: mw, height: mh } = mainWindow.getContentBounds();
-    const toolbarH = 48;
-    const preloadPath = path.join(import.meta.dirname!, '../preload/index.js');
+    const toolbarH = 40;
     settingsWindow = new BrowserWindow({
       x: cx + mw - 384,
       y: cy + toolbarH,
@@ -101,7 +76,7 @@ export function registerIpc(mainWindow: BrowserWindow): void {
       alwaysOnTop: true,
       parent: mainWindow,
       webPreferences: {
-        preload: preloadPath,
+        preload: path.join(import.meta.dirname!, '../preload/index.js'),
         contextIsolation: true,
         nodeIntegration: false,
       },
@@ -117,12 +92,7 @@ export function registerIpc(mainWindow: BrowserWindow): void {
     }
   });
 
-  ipcMain.on('layout:update', (_event, items: LayoutItem[]) => {
-    applyLayout(settings, mainWindow);
-  });
-
   mainWindow.on('close', () => {
-    const bounds = mainWindow.getBounds();
-    saveWindowState(bounds);
+    saveWindowState(mainWindow.getBounds());
   });
 }

@@ -9,11 +9,5 @@ export const useLayoutStore = create<LayoutStore>((set) => ({
   panels: [],
   layoutMode: 'horizontal',
   panelRatios: [],
-
-  setSettings: (settings) =>
-    set({
-      panels: settings.panels,
-      layoutMode: settings.layoutMode,
-      panelRatios: settings.panelRatios,
-    }),
+  setSettings: (settings) => set({ panels: settings.panels, layoutMode: settings.layoutMode, panelRatios: settings.panelRatios }),
 }));
