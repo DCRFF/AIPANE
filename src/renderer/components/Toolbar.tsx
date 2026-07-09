@@ -13,8 +13,7 @@ export default function Toolbar() {
       ))}
 
       <button
-        onClick={() => window.api.openSettings()}
-        className="px-3 py-1 text-sm bg-gray-700 text-gray-300 rounded hover:bg-gray-600 shrink-0"
+        onClick={() => window.api.toggleSettings()}
       >
         ⚙
       </button>

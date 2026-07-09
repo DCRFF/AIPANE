@@ -16,7 +16,7 @@ export default function App() {
         settings.panels[0]?.url === 'https://www.doubao.com/' &&
         settings.panels[1]?.url === 'https://chat.deepseek.com/';
       if (isDefault) {
-        window.api.openSettings();
+        window.api.toggleSettings();
       }
     });
   }, [setSettings]);

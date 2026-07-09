@@ -72,19 +72,20 @@ export function registerIpc(mainWindow: BrowserWindow): void {
     reloadView(id);
   });
 
-  ipcMain.handle('settings:open', () => {
+  ipcMain.handle('settings:toggle', () => {
     if (settingsWindow && !settingsWindow.isDestroyed()) {
-      settingsWindow.focus();
+      settingsWindow.close();
+      settingsWindow = null;
       return;
     }
-    const [wx, wy] = mainWindow.getPosition();
-    const { width: mw, height: mh } = mainWindow.getContentBounds();
+    const { x: cx, y: cy, width: mw, height: mh } = mainWindow.getContentBounds();
+    const toolbarH = 48;
     const preloadPath = path.join(import.meta.dirname!, '../preload/index.js');
     settingsWindow = new BrowserWindow({
-      x: wx + mw - 384,
-      y: wy,
+      x: cx + mw - 384,
+      y: cy + toolbarH,
       width: 384,
-      height: mh,
+      height: mh - toolbarH,
       frame: false,
       transparent: true,
       alwaysOnTop: true,

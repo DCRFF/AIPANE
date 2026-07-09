@@ -38,8 +38,7 @@ export interface BrowserApi {
   removePanel(id: string): Promise<AppSettings>;
   goForward(id: string): Promise<void>;
   reload(id: string): Promise<void>;
-  openSettings(): Promise<void>;
-  closeSettings(): Promise<void>;
+  toggleSettings(): Promise<void>;
   updateLayout(items: LayoutItem[]): void;
   onSettingsInit(callback: (settings: AppSettings) => void): void;
   onSettingsChanged(callback: (settings: AppSettings) => void): void;

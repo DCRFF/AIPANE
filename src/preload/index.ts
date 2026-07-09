@@ -13,7 +13,7 @@ const api = {
   goForward: (id: string): Promise<void> => ipcRenderer.invoke('panel:goForward', id),
   reload: (id: string): Promise<void> => ipcRenderer.invoke('panel:reload', id),
   updateLayout: (items: LayoutItem[]): void => ipcRenderer.send('layout:update', items),
-  openSettings: (): Promise<void> => ipcRenderer.invoke('settings:open'),
+  toggleSettings: (): Promise<void> => ipcRenderer.invoke('settings:toggle'),
   closeSettings: (): Promise<void> => ipcRenderer.invoke('settings:close'),
   onSettingsInit: (callback: (settings: AppSettings) => void): void => {
     ipcRenderer.on('settings:init', (_event, settings) => callback(settings));
