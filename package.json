@@ -1,0 +1,38 @@
+{
+  "name": "ai-browser",
+  "version": "0.1.0",
+  "description": "多栏浏览器 - 单窗口并排打开多个网页",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "dev": "node dev.mjs",
+    "build": "node build.mjs",
+    "package": "pnpm build && electron-builder",
+    "lint": "echo placeholder",
+    "typecheck": "tsc --noEmit",
+    "test": "echo placeholder"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^43.1.0",
+    "electron-store": "^11.0.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "uuid": "^14.0.1",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@types/uuid": "^11.0.0",
+    "@vitejs/plugin-react": "^6.0.3",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.1",
+    "tailwindcss": "^4.3.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.3"
+  }
+}

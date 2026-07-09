@@ -1,0 +1,13 @@
+appId: com.ai-browser.app
+productName: 多栏浏览器
+directories:
+  output: release
+files:
+  - dist/**/*
+  - package.json
+mac:
+  target: dmg
+win:
+  target: nsis
+linux:
+  target: AppImage
