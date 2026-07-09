@@ -29,7 +29,7 @@ export default function SettingsPanel({ onClose }: Props) {
 
   const handleAdd = async () => {
     if (panels.length >= 6) return;
-    const s = await window.api.addPanel('https://chat.deepseek.com/');
+    const s = await window.api.addPanel('about:blank');
     setSettingsFromMain(s);
   };
 

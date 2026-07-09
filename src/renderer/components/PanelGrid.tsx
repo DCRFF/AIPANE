@@ -57,6 +57,7 @@ export default function PanelGrid() {
         display: layoutMode === 'grid' ? 'grid' : 'flex',
         flexDirection: layoutMode === 'vertical' ? 'column' : 'row',
         gridTemplateColumns: layoutMode === 'grid' ? `repeat(${cols}, 1fr)` : undefined,
+        gap: layoutMode === 'grid' ? 6 : 0,
       }}
     >
       {panels.map((panel, i) => (
@@ -65,7 +66,7 @@ export default function PanelGrid() {
           {i < panels.length - 1 && layoutMode !== 'grid' && (
             <div
               className={`shrink-0 bg-gray-600 hover:bg-blue-500 transition-colors ${
-                layoutMode === 'horizontal' ? 'w-1 cursor-col-resize' : 'h-1 cursor-row-resize'
+                layoutMode === 'horizontal' ? 'w-[6px] cursor-col-resize' : 'h-[6px] cursor-row-resize'
               }`}
               onMouseDown={handleDragStart(i)}
             />

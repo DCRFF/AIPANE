@@ -11,13 +11,6 @@ export default function App() {
   useEffect(() => {
     window.api.getSettings().then((settings) => {
       setSettings(settings);
-      const isDefault =
-        settings.panels.length === 2 &&
-        settings.panels[0]?.url === 'https://www.doubao.com/' &&
-        settings.panels[1]?.url === 'https://chat.deepseek.com/';
-      if (isDefault) {
-        window.api.toggleSettings();
-      }
     });
   }, [setSettings]);
   // 监听设置窗口的变更
@@ -33,7 +26,7 @@ export default function App() {
       switch (e.key) {
         case 't':
           e.preventDefault();
-          window.api.addPanel('https://chat.deepseek.com/').then(setSettings);
+          window.api.addPanel('about:blank').then(setSettings);
           break;
         case 'w':
           e.preventDefault();

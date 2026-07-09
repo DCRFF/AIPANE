@@ -59,8 +59,7 @@ document.getElementById('closeBtn').addEventListener('click', () => {
 
 document.getElementById('addBtn').addEventListener('click', async () => {
   if (panels.length >= 6) return;
-  const s = await window.api.addPanel('https://chat.deepseek.com/');
-  panels = s.panels;
+  const s = await window.api.addPanel('about:blank');
   refresh();
 });
 

@@ -22,6 +22,11 @@ export function addView(config: PanelConfig, mainWindow: BrowserWindow): Browser
 
   mainWindow.addBrowserView(view);
   view.webContents.loadURL(config.url);
+  view.webContents.on('dom-ready', () => {
+    if (view.webContents.getURL() === 'about:blank') {
+      view.webContents.insertCSS('html,body{background:#111827 !important}');
+    }
+  });
   views.set(config.id, view);
   return view;
 }
@@ -33,7 +38,6 @@ export function removeView(id: string, mainWindow: BrowserWindow): void {
     views.delete(id);
   }
 }
-
 export function navigateView(id: string, url: string): void {
   const view = views.get(id);
   if (view) {
@@ -42,53 +46,57 @@ export function navigateView(id: string, url: string): void {
 }
 
 export function applyLayout(settings: AppSettings, mainWindow: BrowserWindow): void {
+  const GUTTER = 6;
   const contentBounds = mainWindow.getContentBounds();
   const toolbarHeight = 48;
   const availableWidth = contentBounds.width;
   const availableHeight = contentBounds.height - toolbarHeight;
   const { panels, panelRatios, layoutMode } = settings;
+  const count = panels.length;
 
   if (layoutMode === 'horizontal') {
+    const totalGutter = (count - 1) * GUTTER;
+    const usableWidth = availableWidth - totalGutter;
     panels.forEach((panel, i) => {
       const view = views.get(panel.id);
       if (!view) return;
-      const ratio = panelRatios[i] ?? 1 / panels.length;
-      const x = panelRatios.slice(0, i).reduce((sum, r) => sum + r, 0) * availableWidth;
+      const ratio = panelRatios[i] ?? 1 / count;
+      const x = panelRatios.slice(0, i).reduce((sum, r) => sum + r, 0) * usableWidth + i * GUTTER;
       view.setBounds({
         x: Math.round(x),
         y: toolbarHeight,
-        width: Math.round(availableWidth * ratio),
+        width: Math.round(usableWidth * ratio),
         height: availableHeight,
       });
     });
   } else if (layoutMode === 'vertical') {
+    const totalGutter = (count - 1) * GUTTER;
+    const usableHeight = availableHeight - totalGutter;
     panels.forEach((panel, i) => {
       const view = views.get(panel.id);
       if (!view) return;
-      const ratio = panelRatios[i] ?? 1 / panels.length;
-      const y = panelRatios.slice(0, i).reduce((sum, r) => sum + r, 0) * availableHeight + toolbarHeight;
+      const ratio = panelRatios[i] ?? 1 / count;
+      const y = panelRatios.slice(0, i).reduce((sum, r) => sum + r, 0) * usableHeight + i * GUTTER + toolbarHeight;
       view.setBounds({
         x: 0,
         y: Math.round(y),
         width: availableWidth,
-        height: Math.round(availableHeight * ratio),
+        height: Math.round(usableHeight * ratio),
       });
     });
   } else {
-    // grid
-    const count = panels.length;
     const cols = Math.ceil(Math.sqrt(count));
     const rows = Math.ceil(count / cols);
-    const cellW = Math.round(availableWidth / cols);
-    const cellH = Math.round(availableHeight / rows);
+    const cellW = Math.round((availableWidth - (cols - 1) * GUTTER) / cols);
+    const cellH = Math.round((availableHeight - (rows - 1) * GUTTER) / rows);
     panels.forEach((panel, i) => {
       const view = views.get(panel.id);
       if (!view) return;
       const col = i % cols;
       const row = Math.floor(i / cols);
       view.setBounds({
-        x: col * cellW,
-        y: row * cellH + toolbarHeight,
+        x: col * (cellW + GUTTER),
+        y: row * (cellH + GUTTER) + toolbarHeight,
         width: cellW,
         height: cellH,
       });
