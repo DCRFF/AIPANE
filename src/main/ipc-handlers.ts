@@ -1,18 +1,13 @@
 import { ipcMain, BrowserWindow } from 'electron';
-import path from 'path';
 import { v4 as uuid } from 'uuid';
 import { loadSettings, saveSettings, loadWindowState, saveWindowState } from './store.js';
-import type { AppSettings, PanelConfig } from '../shared/types.js';
+import type { AppSettings } from '../shared/types.js';
 
 export function registerIpc(mainWindow: BrowserWindow): void {
   let settings = loadSettings();
-  let settingsWindow: BrowserWindow | null = null;
 
   function broadcast() {
     mainWindow.webContents.send('settings:changed', settings);
-    if (settingsWindow && !settingsWindow.isDestroyed()) {
-      settingsWindow.webContents.send('settings:changed', settings);
-    }
   }
 
   mainWindow.webContents.on('did-finish-load', () => {
@@ -56,40 +51,6 @@ export function registerIpc(mainWindow: BrowserWindow): void {
     saveSettings(settings);
     broadcast();
     return settings;
-  });
-
-  ipcMain.handle('settings:toggle', () => {
-    if (settingsWindow && !settingsWindow.isDestroyed()) {
-      settingsWindow.close();
-      settingsWindow = null;
-      return;
-    }
-    const { x: cx, y: cy, width: mw, height: mh } = mainWindow.getContentBounds();
-    const toolbarH = 40;
-    settingsWindow = new BrowserWindow({
-      x: cx + mw - 384,
-      y: cy + toolbarH,
-      width: 384,
-      height: mh - toolbarH,
-      frame: false,
-      transparent: true,
-      alwaysOnTop: true,
-      parent: mainWindow,
-      webPreferences: {
-        preload: path.join(import.meta.dirname!, '../preload/index.js'),
-        contextIsolation: true,
-        nodeIntegration: false,
-      },
-    });
-    settingsWindow.loadFile(path.join(import.meta.dirname!, '../settings/index.html'));
-    settingsWindow.on('closed', () => { settingsWindow = null; });
-  });
-
-  ipcMain.handle('settings:close', () => {
-    if (settingsWindow && !settingsWindow.isDestroyed()) {
-      settingsWindow.close();
-      settingsWindow = null;
-    }
   });
 
   mainWindow.on('close', () => {

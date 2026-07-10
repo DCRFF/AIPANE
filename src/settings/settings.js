@@ -1,3 +1,5 @@
+console.log('[settings] loaded, api:', typeof window.api);
+
 let panels = [];
 let layoutMode = 'horizontal';
 
@@ -24,7 +26,6 @@ function renderUrls() {
     const div = document.createElement('div');
     div.className = 'panel-row';
 
-    // Name row
     const nameRow = document.createElement('div');
     nameRow.className = 'name-row';
     nameRow.innerHTML = `<span class="label">面板 ${i + 1}</span>`;
@@ -75,10 +76,6 @@ function renderLayoutBtns() {
     $layoutBtns.appendChild(btn);
   });
 }
-
-document.getElementById('closeBtn').addEventListener('click', () => {
-  window.api.closeSettings();
-});
 
 document.getElementById('addBtn').addEventListener('click', async () => {
   if (panels.length >= 6) return;

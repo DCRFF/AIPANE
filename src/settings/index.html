@@ -5,18 +5,16 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #1f2937; color: #fff; padding: 24px; }
-    h2 { font-size: 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-    h2 button { background: none; border: none; color: #9ca3af; font-size: 20px; cursor: pointer; }
-    h2 button:hover { color: #fff; }
+    button:focus, input:focus { outline: none; }
     label { display: block; font-size: 13px; color: #9ca3af; margin-bottom: 6px; }
     .section { margin-bottom: 20px; }
+    .section:first-child { margin-top: 8px; }
     input[type="text"] { width: 100%; padding: 8px 12px; background: #374151; color: #fff; border: none; border-radius: 4px; font-size: 13px; }
-    input[type="text"]:focus { outline: none; box-shadow: 0 0 0 1px #3b82f6; }
     .panel-row { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #374151; }
     .panel-row:last-child { border-bottom: 0; }
     .name-row { display: flex; align-items: center; margin-bottom: 4px; }
     .name-row .label { font-size: 11px; color: #6b7280; white-space: nowrap; }
-    .btn { padding: 6px 12px; background: #374151; color: #fff; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; }
+    .btn { padding: 6px 12px; background: #374151; color: #fff; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; outline: none; }
     .btn:hover { background: #4b5563; }
     .btn:disabled { opacity: 0.3; cursor: default; }
     .btn.active { background: #2563eb; }
@@ -24,8 +22,6 @@
   </style>
 </head>
 <body>
-  <h2>设置 <button id="closeBtn">✕</button></h2>
-
   <div class="section">
     <label>面板数量 (<span id="count">2</span>/6)</label>
     <button class="btn" id="addBtn">+</button>

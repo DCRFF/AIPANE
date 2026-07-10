@@ -1,17 +1,13 @@
 import { useState } from 'react';
 import { useLayoutStore } from '../store';
 
-interface Props {
-  onClose: () => void;
-}
-
 const LAYOUT_MODES = [
   { value: 'horizontal' as const, label: '横向' },
   { value: 'vertical' as const, label: '纵向' },
   { value: 'grid' as const, label: '田字' },
 ];
 
-export default function SettingsPanel({ onClose }: Props) {
+export default function SettingsPanel() {
   const panels = useLayoutStore((s) => s.panels);
   const layoutMode = useLayoutStore((s) => s.layoutMode);
   const setSettingsFromMain = useLayoutStore((s) => s.setSettings);
@@ -59,11 +55,7 @@ export default function SettingsPanel({ onClose }: Props) {
   };
 
   return (
-    <div className="h-full bg-gray-800 p-6 overflow-y-auto border-l border-gray-700">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-white">设置</h2>
-        <button onClick={onClose} className="text-gray-400 hover:text-white text-xl">✕</button>
-      </div>
+    <div className="h-full p-6 overflow-y-auto">
 
       <div className="mb-6">
         <label className="block text-sm text-gray-400 mb-2">面板数量 ({panels.length}/6)</label>

@@ -8,8 +8,6 @@ const api = {
   removePanel: (id: string): Promise<AppSettings> => ipcRenderer.invoke('panel:remove', id),
   navigate: (id: string, url: string): Promise<AppSettings> => ipcRenderer.invoke('panel:navigate', id, url),
   renamePanel: (id: string, name: string): Promise<AppSettings> => ipcRenderer.invoke('panel:rename', id, name),
-  toggleSettings: (): Promise<void> => ipcRenderer.invoke('settings:toggle'),
-  closeSettings: (): Promise<void> => ipcRenderer.invoke('settings:close'),
   onSettingsInit: (callback: (settings: AppSettings) => void): void => {
     ipcRenderer.on('settings:init', (_event, settings) => callback(settings));
   },

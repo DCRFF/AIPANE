@@ -18,8 +18,6 @@ export interface BrowserApi {
   removePanel(id: string): Promise<AppSettings>;
   navigate(id: string, url: string): Promise<AppSettings>;
   renamePanel(id: string, name: string): Promise<AppSettings>;
-  toggleSettings(): Promise<void>;
-  closeSettings(): Promise<void>;
   onSettingsInit(callback: (settings: AppSettings) => void): void;
   onSettingsChanged(callback: (settings: AppSettings) => void): void;
 }

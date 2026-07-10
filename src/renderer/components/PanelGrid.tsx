@@ -36,11 +36,17 @@ export default function PanelGrid() {
 
   const cols = Math.ceil(Math.sqrt(panels.length));
 
+  const needsPadding = (i: number) => {
+    if (layoutMode === 'horizontal') return i === panels.length - 1;
+    if (layoutMode === 'vertical') return i === 0;
+    return i === Math.min(cols - 1, panels.length - 1);
+  };
+
   return (
     <div ref={gridRef} className="flex-1" style={{ display: layoutMode === 'grid' ? 'grid' : 'flex', flexDirection: layoutMode === 'vertical' ? 'column' : 'row', gridTemplateColumns: layoutMode === 'grid' ? `repeat(${cols}, 1fr)` : undefined, gap: layoutMode === 'grid' ? 4 : 2 }}>
       {panels.map((panel, i) => (
         <div key={panel.id} className="flex" style={layoutMode !== 'grid' ? { flex: panelRatios[i] ?? 1 / panels.length } : undefined}>
-          <PanelView panelId={panel.id} panelName={panel.name} panelUrl={panel.url} showSettingsBtn={i === panels.length - 1} />
+          <PanelView panelId={panel.id} panelName={panel.name} panelUrl={panel.url} needsPadding={needsPadding(i)} />
           {i < panels.length - 1 && layoutMode !== 'grid' && (
             <div className={`shrink-0 bg-gray-600 hover:bg-blue-500 transition-colors ${layoutMode === 'horizontal' ? 'w-[6px] cursor-col-resize' : 'h-[6px] cursor-row-resize'}`} onMouseDown={handleDragStart(i)} />
           )}
