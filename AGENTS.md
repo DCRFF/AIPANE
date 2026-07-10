@@ -2,7 +2,7 @@
 
 ## 项目
 
-多栏浏览器 —— Electron + React + TypeScript 桌面应用。单一窗口内通过 BrowserView 并排打开 2-3 个网页，各栏独立浏览。
+多栏浏览器 —— Electron + React + TypeScript 桌面应用。单一窗口内通过 webview 并排打开 1-6 个网页，各栏独立浏览。设置面板为内联覆盖层，从窗口右上角齿轮按钮唤出。
 
 ## 技术栈
 
@@ -12,11 +12,12 @@ Electron · React · TypeScript · zustand · Vite · Tailwind CSS · pnpm
 
 ```
 src/
-├── main/           # Electron 主进程（窗口、BrowserView、IPC）
+├── main/           # Electron 主进程（窗口管理、IPC 处理）
 ├── preload/        # contextBridge 桥接层
-├── renderer/       # React 外壳（工具栏、分栏布局）
+├── renderer/       # React 应用（面板网格、地址栏、设置面板）
+│   └── components/ # PanelGrid / PanelView / AddressBar / SettingsPanel
+├── settings/       # 独立设置页面（备用，已不使用）
 └── shared/         # 跨进程类型定义
-```
 
 ## 启动方式
 
@@ -41,7 +42,8 @@ pnpm test      # 测试
 ```
 ## 核心约定
 - **IPC 全异步**：`ipcRenderer.invoke` / `ipcMain.handle`，禁止 `sendSync` 和 `remote`
-- **BrowserView 在主进程管理**，渲染进程通过 IPC 驱动，手动 `setBounds` 对齐分栏
+- **webview 在渲染进程管理**，PanelView 组件直接渲染 <webview> 标签
+- **设置面板内联**，通过 React 状态控制显隐，不走独立 BrowserWindow
 - **zustand 做状态管理**，不引入 Redux
 - **共享类型**放 `src/shared/types.ts`，main 和 renderer 不能互相 import
 - **命名**：目录 kebab-case，组件 PascalCase，工具 camelCase
