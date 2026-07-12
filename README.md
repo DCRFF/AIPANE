@@ -41,6 +41,24 @@ pnpm dev
 node build.mjs && ./node_modules/.bin/electron .
 ```
 
+## Packaging
+
+Build distributable packages for all platforms:
+
+```bash
+# Prune dev dependencies (required for correct packaging)
+rm -rf node_modules && pnpm install --prod --no-frozen-lockfile
+
+# Build for all platforms (arm64 + x64)
+npx electron-builder --mac --win --linux
+npx electron-builder --win --linux --x64
+
+# Restore dev dependencies
+pnpm install
+```
+
+**Important:** Always `install --prod` before packaging — `electron-builder` with pnpm will otherwise bundle the entire `node_modules` (~470M) into the app.
+
 ## Keyboard Shortcuts
 
 | Shortcut | Action |

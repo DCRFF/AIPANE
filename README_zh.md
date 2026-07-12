@@ -41,6 +41,24 @@ pnpm dev
 node build.mjs && ./node_modules/.bin/electron .
 ```
 
+## 打包发布
+
+构建各平台安装包：
+
+```bash
+# 清理 devDependencies（打包前必须）
+rm -rf node_modules && pnpm install --prod --no-frozen-lockfile
+
+# 构建所有平台（arm64 + x64）
+npx electron-builder --mac --win --linux
+npx electron-builder --win --linux --x64
+
+# 恢复开发依赖
+pnpm install
+```
+
+**注意：** 打包前必须 `install --prod`，否则 pnpm 下的 `electron-builder` 会把整个 `node_modules`（约 470M）打进安装包。
+
 ## 快捷键
 
 | 快捷键 | 操作 |

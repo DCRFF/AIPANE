@@ -50,6 +50,16 @@ pnpm test      # 测试
 - **样式**：Tailwind CSS，全程统一
 - **README 双语文档**：`README.md`（英文）为主，`README_zh.md`（中文）保持同步，每次 git 提交前需更新两份文档
 
+## 构建与打包
+
+详见 README.md 的 **Packaging** 章节。关键要点：
+
+- **打包前必须 `install --prod`**，否则 pnpm 的 electron-builder 会把全部 devDependencies 打进 asar
+- `package.json` 的 `build.files` 必须精确指定子目录（`dist/main/**` 等），不能用 `dist/**/*`（会把 electron-builder 自身输出也打包进去）
+- `build.electronVersion` 指定精确版本号，避免 electron-builder 依赖 `node_modules/electron` 检测版本
+- Windows 在 macOS 上交叉编译 NSIS 会失败，改用 `target: zip`
+- `.npmrc` 设置 `node-linker=hoisted` 使 node_modules 扁平化
+
 ## 测试
 
 Vitest（单元） + Playwright（E2E + Electron）
