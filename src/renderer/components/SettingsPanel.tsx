@@ -73,6 +73,7 @@ export default function SettingsPanel() {
     const panelRatios = panels.map(() => 1 / panels.length);
     const cols = Math.ceil(Math.sqrt(panels.length));
     const rows = Math.ceil(panels.length / cols);
+    const rowRatios = mode === 'grid' ? Array.from({ length: rows }, () => 1 / rows) : [];
     const newSettings = { panels, layoutMode: mode, panelRatios, rowRatios, panelOrder };
     await window.api.updateSettings(newSettings);
     setSettingsFromMain(newSettings);

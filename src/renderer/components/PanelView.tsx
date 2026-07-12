@@ -41,7 +41,7 @@ export default function PanelView({ panelId, panelUrl, needsPadding, index, onDr
         <input type="text" value={url} onChange={(e) => setUrl(e.target.value)} onKeyDown={handleKeyDown} className="flex-1 px-2 py-0.5 bg-gray-700/60 text-gray-200 text-xs rounded focus:outline-none focus:ring-1 focus:ring-blue-500 min-w-0" placeholder="网址..." />
         <button onClick={() => window.api.removePanel(panelId)} className="px-1.5 text-[10px] text-gray-400 hover:text-red-400 shrink-0 cursor-pointer">✕</button>
       </div>
-      <webview ref={webviewRef} src={url} className="flex-1" style={{ display: 'flex' }} />
+      <webview ref={webviewRef} src={url} className="flex-1" style={{ display: 'flex', width: '100%' }} />
     </div>
   );
 }
