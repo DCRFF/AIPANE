@@ -1,7 +1,7 @@
 {
-  "name": "ai-browser",
+  "name": "aipane",
   "version": "0.1.0",
-  "description": "多栏浏览器 - 单窗口并排打开多个网页",
+  "description": "AIpane - 单窗口多面板浏览器",
   "main": "dist/main/index.js",
   "scripts": {
     "dev": "node dev.mjs",

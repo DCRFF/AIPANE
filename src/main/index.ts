@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 function createWindow() {
   const winState = loadWindowState();
   const mainWindow = new BrowserWindow({
+    title: 'AIpane',
     x: winState.x,
     y: winState.y,
     width: winState.width,
