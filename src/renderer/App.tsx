@@ -30,7 +30,7 @@ export default function App() {
       <PanelGrid />
       <button
         onClick={() => setShowSettings((v) => !v)}
-        className="fixed top-0 right-0 z-50 flex items-center px-2 h-8 text-gray-400 text-sm select-none"
+        className="absolute top-2 right-2 z-50 flex items-center px-2 h-8 text-gray-400 text-sm select-none"
       >
         <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-gray-800 hover:bg-gray-700 hover:text-white">
           <span className="text-xs">设置</span>
