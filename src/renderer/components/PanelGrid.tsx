@@ -61,7 +61,6 @@ export default function PanelGrid() {
                   <PanelView
                     key={panel.id}
                     panelId={panel.id}
-                    panelName={panel.name}
                     panelUrl={panel.url}
                     needsPadding={rowIdx === 0 && colIdx === rowPanels.length - 1}
                   />
@@ -96,7 +95,6 @@ export default function PanelGrid() {
           <PanelView
             key={panel.id}
             panelId={panel.id}
-            panelName={panel.name}
             panelUrl={panel.url}
             needsPadding={needsPadding(i)}
           />
