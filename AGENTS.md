@@ -57,16 +57,20 @@ Vitest（单元） + Playwright（E2E + Electron）
 
 执行计划：[docs/plan/26-07-09-01-执行计划.md](../docs/plan/26-07-09-01-执行计划.md)
 设计背景：[docs/report/26-07-09-01-项目计划.md](../docs/report/26-07-09-01-项目计划.md)
+Bug 分析：[docs/report/26-07-12-01-SplitPane-bug分析.md](../docs/report/26-07-12-01-SplitPane-bug分析.md)
+拖拽排序方案：[docs/report/26-07-12-02-面板拖拽排序方案.md](../docs/report/26-07-12-02-面板拖拽排序方案.md)
+CSS Grid 方案分析：[docs/report/26-07-12-03-CSSGrid布局方案分析.md](../docs/report/26-07-12-03-CSSGrid布局方案分析.md)
+切换布局方案调研：[docs/report/26-07-12-04-切换布局方案调研.md](../docs/report/26-07-12-04-切换布局方案调研.md)
+布局改造计划：[docs/plan/26-07-12-01-面板池布局改造计划.md](../docs/plan/26-07-12-01-面板池布局改造计划.md)
 
-## Bug 修复 / 特性开发约定
+## 已实现功能
 
-- 修复 bug 或完成特性开发后，**必须打开应用让用户查看效果**。
-- 重新构建并启动生产模式的命令：
-  ```bash
-  pkill -f "Electron.app" 2>/dev/null; node build.mjs && ./node_modules/.bin/electron .
-  ```
+- 横向 / 纵向 / 田字三种布局
+- 分割线拖拽调整面板比例
+- **卡片式拖拽排序**：拖拽地址栏交换面板位置，零 React 重渲染，pointer capture 防 webview 吞事件
+- 面板增删（1-6 个），配置自动持久化
+- 快捷键 `Ctrl+T` 新建面板
 
-## 已知陷阱
+## 待实施
 
-- **CSS `flex: <number>` 的 flex-grow 语义**：`flex: 0.333` 在浏览器中等价于 `flex: 0.333 1 0%`。如果容器内所有 flex 项的 flex-grow 总和 ≠ 1，浏览器按**绝对比例**分配空间（而非相对比例），导致留白。传入 SplitPane 的 `ratios` 必须确保 sum = 1。
-- **设置按钮**：位于 `App.tsx`，`absolute top-2 right-2`，与面板网格的 `p-2` 顶部边距对齐。设置面板的关闭按钮需要给最右侧面板的地址栏加 `pr-[72px]` 避免遮挡。
+- [面板池布局改造](docs/plan/26-07-12-01-面板池布局改造计划.md)：解决切换布局时 webview 重载问题
