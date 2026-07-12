@@ -41,6 +41,8 @@ async function main() {
   await Promise.all([buildMain(), buildPreload()]);
   cpSync('src/settings', 'dist/settings', { recursive: true });
   console.log('[build] settings copied');
+  cpSync('resources', 'dist/resources', { recursive: true });
+  console.log('[build] resources copied');
   await buildRenderer();
 }
 

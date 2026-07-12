@@ -11,6 +11,7 @@ function createWindow() {
   const winState = loadWindowState();
   const mainWindow = new BrowserWindow({
     title: 'AIpane',
+    icon: path.join(__dirname, '../../resources/icon.png'),
     x: winState.x,
     y: winState.y,
     width: winState.width,

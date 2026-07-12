@@ -15,6 +15,26 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "build": {
+    "appId": "com.aipane.app",
+    "productName": "AIpane",
+    "files": [
+      "dist/**/*",
+      "resources/**/*"
+    ],
+    "mac": {
+      "icon": "resources/icon.icns",
+      "target": "dmg"
+    },
+    "win": {
+      "icon": "resources/icon.png",
+      "target": "nsis"
+    },
+    "linux": {
+      "icon": "resources/icon.png",
+      "target": "AppImage"
+    }
+  },
   "dependencies": {
     "electron": "^43.1.0",
     "electron-store": "^11.0.2",
