@@ -13,7 +13,7 @@ const AI_SERVICES = [
   { name: 'ChatGPT',    url: 'https://chatgpt.com/' },
   { name: 'Claude',     url: 'https://claude.ai/' },
   { name: 'Gemini',     url: 'https://gemini.google.com/' },
-  { name: '通义千问',    url: 'https://tongyi.aliyun.com/' },
+  { name: '通义千问',    url: 'https://www.qianwen.com/' },
   { name: 'Kimi',       url: 'https://kimi.moonshot.cn/' },
   { name: 'Perplexity', url: 'https://www.perplexity.ai/' },
 ];
