@@ -39,20 +39,13 @@ export default function PanelGrid() {
     return rr.map((r) => r / sum);
   })();
 
-  // ── Per-row panel data ──
-  const gridRows = (() => {
-    if (layoutMode !== 'grid') return [];
-    const result: { vpStart: number; count: number }[] = [];
-    let vp = 0;
-    for (let r = 0; r < rows; r++) {
-      const count = r === rows - 1 ? panels.length - r * cols : cols;
-      result.push({ vpStart: vp, count });
-      vp += count;
-    }
-    return result;
-  })();
+  // ── Grid column ratios (ephemeral, reset on cols change) ──
+  const gridColRatiosRef = useRef<number[]>([]);
+  if (layoutMode === 'grid' && gridColRatiosRef.current.length !== cols) {
+    gridColRatiosRef.current = Array.from({ length: cols }, () => 1 / cols);
+  }
 
-  // ── Container style ──
+  // ── Container style — always CSS Grid (all panels are direct children) ──
   const containerRef = useRef<HTMLDivElement>(null);
   const containerStyle: React.CSSProperties = (() => {
     if (layoutMode === 'horizontal') {
@@ -71,23 +64,35 @@ export default function PanelGrid() {
         gridTemplateRows: trackStr(validRatios),
       };
     }
-    // grid: outer flex column
+    // grid: flat CSS grid, panels positioned via grid-column/grid-row
     return {
-      display: 'flex',
-      flexDirection: 'column',
+      display: 'grid',
       gap: 0,
+      gridTemplateColumns: trackStr(gridColRatiosRef.current),
+      gridTemplateRows: trackStr(normRowRatios),
     };
   })();
 
-  // ── Panel grid placement ──
+  // ── Panel grid placement (applies to all modes) ──
   const getPanelStyle = (vp: number): React.CSSProperties => {
+    if (layoutMode === 'horizontal') {
+      return {
+        gridColumn: `${1 + vp * 2} / ${2 + vp * 2}`,
+        gridRow: '1 / 2',
+      };
+    }
+    if (layoutMode === 'vertical') {
+      return {
+        gridColumn: '1 / 2',
+        gridRow: `${1 + vp * 2} / ${2 + vp * 2}`,
+      };
+    }
+    // grid
     const col = vp % cols;
     const row = Math.floor(vp / cols);
-    const panelsInRow = row === rows - 1 ? panels.length - row * cols : cols;
-    const colSpan = panelsInRow === 1 ? cols : 1;
     return {
-      gridColumn: colSpan > 1 ? '1 / -1' : `${1 + col * 2} / ${2 + col * 2}`,
-      gridRow: '1 / 2',
+      gridColumn: `${1 + col * 2} / ${2 + col * 2}`,
+      gridRow: `${1 + row * 2} / ${2 + row * 2}`,
     };
   };
 
@@ -232,78 +237,59 @@ export default function PanelGrid() {
     document.addEventListener('pointerup', onUp);
   }, []);
 
-  // ── Divider drag ──
-  const handleColDividerDrag = useCallback(
-    (rowIndex: number, gapIndex: number) => (e: React.PointerEvent) => {
+  // ── Grid column divider drag (flat grid, spans all rows) ──
+  const handleGridColDividerDrag = useCallback(
+    (gapIndex: number) => (e: React.PointerEvent) => {
       e.preventDefault();
+      const container = containerRef.current;
+      if (!container) return;
       const grip = e.currentTarget as HTMLElement;
-      const rowEl = grip.closest<HTMLDivElement>('[data-grid-row]');
-      if (!rowEl) return;
-
       grip.setPointerCapture(e.pointerId);
 
-      const vpStart = gridRows[rowIndex]?.vpStart ?? 0;
-      const i0 = vpStart + gapIndex;
-      const i1 = i0 + 1;
-      const startRatios = [...validRatios];
+      const startColRatios = [...gridColRatiosRef.current];
       const startPos = e.clientX;
-      const totalSize = rowEl.clientWidth;
-      const rawSlice = startRatios.slice(vpStart, vpStart + (gridRows[rowIndex]?.count ?? 0));
-      const rSum = rawSlice.reduce((a, b) => a + b, 0) || 1;
-      const startSlice = rawSlice.map((r) => r / rSum);
+      const totalSize = container.clientWidth;
+      const pairSum = startColRatios[gapIndex] + startColRatios[gapIndex + 1];
 
-      let latestLeft = startSlice[gapIndex];
-      let latestRight = startSlice[gapIndex + 1];
+      let latestLeft = startColRatios[gapIndex];
+      let latestRight = startColRatios[gapIndex + 1];
 
       const onMove = (ev: PointerEvent) => {
         const delta = ev.clientX - startPos;
         const deltaRatio = delta / totalSize;
-        const leftRatio = Math.max(0.1, startSlice[gapIndex] + deltaRatio);
-        const rightRatio = Math.max(0.1, startSlice[gapIndex + 1] - deltaRatio);
+        const leftRatio = Math.max(0.05, startColRatios[gapIndex] + deltaRatio);
+        const rightRatio = Math.max(0.05, startColRatios[gapIndex + 1] - deltaRatio);
         const newPairSum = leftRatio + rightRatio;
-        const scale = (startSlice[gapIndex] + startSlice[gapIndex + 1]) / newPairSum;
+        const scale = pairSum / newPairSum;
         latestLeft = leftRatio * scale;
         latestRight = rightRatio * scale;
 
-        const newSlice = [...startSlice];
-        newSlice[gapIndex] = latestLeft;
-        newSlice[gapIndex + 1] = latestRight;
-        rowEl.style.gridTemplateColumns = trackStr(newSlice);
+        const newRatios = [...startColRatios];
+        newRatios[gapIndex] = latestLeft;
+        newRatios[gapIndex + 1] = latestRight;
+        container.style.gridTemplateColumns = trackStr(newRatios);
       };
-
-      const rawSum = rawSlice.reduce((a, b) => a + b, 0) || 1;
 
       const onUp = () => {
         grip.removeEventListener('pointermove', onMove);
         grip.removeEventListener('pointerup', onUp);
         grip.releasePointerCapture(e.pointerId);
-
-        const newRatios = [...startRatios];
-        newRatios[i0] = latestLeft * rawSum;
-        newRatios[i1] = latestRight * rawSum;
-        useLayoutStore.setState({ panelRatios: newRatios });
-        const s = useLayoutStore.getState();
-        window.api.updateSettings({
-          panels: s.panels,
-          layoutMode,
-          panelRatios: newRatios,
-          rowRatios,
-          panelOrder: s.panelOrder,
-        });
+        gridColRatiosRef.current[gapIndex] = latestLeft;
+        gridColRatiosRef.current[gapIndex + 1] = latestRight;
       };
 
       grip.addEventListener('pointermove', onMove);
       grip.addEventListener('pointerup', onUp);
     },
-    [validRatios, layoutMode, rowRatios, gridRows],
+    [],
   );
 
-  const handleRowDividerDrag = useCallback(
+  // ── Grid row divider drag (flat grid, spans all columns) ──
+  const handleGridRowDividerDrag = useCallback(
     (index: number) => (e: React.PointerEvent) => {
       e.preventDefault();
       const container = containerRef.current;
       if (!container) return;
-
       const grip = e.currentTarget as HTMLElement;
       grip.setPointerCapture(e.pointerId);
 
@@ -319,8 +305,8 @@ export default function PanelGrid() {
       const onMove = (ev: PointerEvent) => {
         const delta = ev.clientY - startPos;
         const deltaRatio = delta / totalSize;
-        const topRatio = Math.max(0.1, startRatios[index] + deltaRatio);
-        const bottomRatio = Math.max(0.1, startRatios[index + 1] - deltaRatio);
+        const topRatio = Math.max(0.05, startRatios[index] + deltaRatio);
+        const bottomRatio = Math.max(0.05, startRatios[index + 1] - deltaRatio);
         const newPairSum = topRatio + bottomRatio;
         const scale = pairSum / newPairSum;
         latestTop = topRatio * scale;
@@ -329,11 +315,7 @@ export default function PanelGrid() {
         const newRatios = [...startRatios];
         newRatios[index] = latestTop;
         newRatios[index + 1] = latestBottom;
-
-        // Update row flex values directly
-        const rowEls = container.querySelectorAll<HTMLElement>('[data-grid-row]');
-        if (rowEls[index]) rowEls[index].style.flex = `${latestTop} 1 0%`;
-        if (rowEls[index + 1]) rowEls[index + 1].style.flex = `${latestBottom} 1 0%`;
+        container.style.gridTemplateRows = trackStr(newRatios);
       };
 
       const onUp = () => {
@@ -425,142 +407,96 @@ export default function PanelGrid() {
 
   // ── Needs padding for settings button ──
   const needsPadding = (vp: number) => {
-    if (layoutMode === 'horizontal') return vp === panels.length - 1;
     if (layoutMode === 'vertical') return vp === 0;
+    if (layoutMode === 'grid') {
+      // settings button is top-right; padding for top-right panel
+      const col = vp % cols;
+      const row = Math.floor(vp / cols);
+      return row === 0 && col === cols - 1;
+    }
     return false;
   };
 
-  // ── Render panel in a row ──
-  const renderPanel = (panel: typeof panels[0], si: number, vp: number) => (
-    <div
-      key={panel.id}
-      data-panel
-      data-panel-index={si}
-      className="flex flex-col min-w-0 min-h-0 overflow-hidden"
-      style={getPanelStyle(vp)}
-    >
-      <PanelView
-        panelId={panel.id}
-        panelUrl={panel.url}
-        needsPadding={needsPadding(vp)}
-        index={si}
-        onDragStart={handleDragStart}
-      />
-    </div>
-  );
-
-  // ── Render grid-mode content (nested rows) ──
-  const renderGridContent = () => {
-    const els: React.ReactNode[] = [];
-    for (let r = 0; r < rows; r++) {
-      const rowData = gridRows[r];
-      const rawSlice = validRatios.slice(rowData.vpStart, rowData.vpStart + rowData.count);
-      const sum = rawSlice.reduce((a, b) => a + b, 0) || 1;
-      const rowRatiosSlice = rawSlice.map((r) => r / sum);
-
-      // Row container
-      els.push(
-        <div
-          key={`row-${r}`}
-          data-grid-row
-          style={{ flex: `${normRowRatios[r] ?? 1 / rows} 1 0%`, width: '100%', minWidth: 0, display: 'grid', gap: 0, gridTemplateColumns: trackStr(rowRatiosSlice), gridTemplateRows: '1fr' }}
-        >
-          {panels.map((panel, si) => {
-            const vp = order[si];
-            const row = Math.floor(vp / cols);
-            if (row !== r) return null;
-            return renderPanel(panel, si, vp);
-          })}
-          {/* Column dividers */}
-          {rowData.count > 1 && Array.from({ length: rowData.count - 1 }, (_, c) => (
-            <div
-              key={`gh-${r}-${c}`}
-              className="relative shrink-0 group w-2 cursor-col-resize"
-              style={{ gridColumn: `${2 + c * 2} / ${3 + c * 2}`, gridRow: '1 / 2' }}
-              onPointerDown={handleColDividerDrag(r, c)}
-            >
-              <div className="absolute inset-y-1 left-1/2 -translate-x-1/2 w-[3px] rounded-full bg-transparent group-hover:bg-blue-500/40 transition-colors duration-200" />
-            </div>
-          ))}
-        </div>,
-      );
-
-      // Row divider
-      if (r < rows - 1) {
-        els.push(
-          <div
-            key={`gv-${r}`}
-            className="relative shrink-0 group h-2 cursor-row-resize"
-            onPointerDown={handleRowDividerDrag(r)}
-          >
-            <div className="absolute inset-x-1 top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-transparent group-hover:bg-blue-500/40 transition-colors duration-200" />
-          </div>,
-        );
-      }
-    }
-    return els;
-  };
-
   // ── Render ──
-  const isGrid = layoutMode === 'grid';
-
   return (
     <div
       ref={containerRef}
       className="flex-1 p-2 overflow-hidden"
       style={containerStyle}
     >
-      {isGrid ? renderGridContent() : (
-        <>
-          {panels.map((panel, i) => {
-            const vp = order[i];
-            return (
-              <div
-                key={panel.id}
-                data-panel
-                data-panel-index={i}
-                className="flex min-w-0 min-h-0 overflow-hidden"
-                style={layoutMode === 'horizontal'
-                  ? { gridColumn: `${1 + vp * 2} / ${2 + vp * 2}`, gridRow: '1 / 2' }
-                  : { gridColumn: '1 / 2', gridRow: `${1 + vp * 2} / ${2 + vp * 2}` }
-                }
-              >
-                <PanelView
-                  panelId={panel.id}
-                  panelUrl={panel.url}
-                  needsPadding={needsPadding(vp)}
-                  index={i}
-                  onDragStart={handleDragStart}
-                />
-              </div>
-            );
-          })}
+      {/* Panels — always flat direct children */}
+      {panels.map((panel, i) => {
+        const vp = order[i];
+        return (
+          <div
+            key={panel.id}
+            data-panel
+            data-panel-index={i}
+            className="flex min-w-0 min-h-0 overflow-hidden"
+            style={getPanelStyle(vp)}
+          >
+            <PanelView
+              panelId={panel.id}
+              panelUrl={panel.url}
+              needsPadding={needsPadding(vp)}
+              index={i}
+              onDragStart={handleDragStart}
+            />
+          </div>
+        );
+      })}
 
-          {/* 1D dividers */}
-          {layoutMode === 'horizontal' && panels.length > 1 &&
-            Array.from({ length: panels.length - 1 }, (_, i) => (
-              <div
-                key={`div-${i}`}
-                className="relative shrink-0 group w-2 cursor-col-resize"
-                style={{ gridColumn: `${2 + i * 2} / ${3 + i * 2}`, gridRow: '1 / 2' }}
-                onPointerDown={handleDividerDrag1D(i, 'x')}
-              >
-                <div className="absolute inset-y-1 left-1/2 -translate-x-1/2 w-[3px] rounded-full bg-transparent group-hover:bg-blue-500/40 transition-colors duration-200" />
-              </div>
-            ))}
-          {layoutMode === 'vertical' && panels.length > 1 &&
-            Array.from({ length: panels.length - 1 }, (_, i) => (
-              <div
-                key={`div-${i}`}
-                className="relative shrink-0 group h-2 cursor-row-resize"
-                style={{ gridColumn: '1 / 2', gridRow: `${2 + i * 2} / ${3 + i * 2}` }}
-                onPointerDown={handleDividerDrag1D(i, 'y')}
-              >
-                <div className="absolute inset-x-1 top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-transparent group-hover:bg-blue-500/40 transition-colors duration-200" />
-              </div>
-            ))}
-        </>
-      )}
+      {/* Column dividers — horizontal mode */}
+      {layoutMode === 'horizontal' && panels.length > 1 &&
+        Array.from({ length: panels.length - 1 }, (_, i) => (
+          <div
+            key={`div-${i}`}
+            className="relative shrink-0 group w-2 cursor-col-resize"
+            style={{ gridColumn: `${2 + i * 2} / ${3 + i * 2}`, gridRow: '1 / 2' }}
+            onPointerDown={handleDividerDrag1D(i, 'x')}
+          >
+            <div className="absolute inset-y-1 left-1/2 -translate-x-1/2 w-[3px] rounded-full bg-transparent group-hover:bg-blue-500/40 transition-colors duration-200" />
+          </div>
+        ))}
+
+      {/* Row dividers — vertical mode */}
+      {layoutMode === 'vertical' && panels.length > 1 &&
+        Array.from({ length: panels.length - 1 }, (_, i) => (
+          <div
+            key={`div-${i}`}
+            className="relative shrink-0 group h-2 cursor-row-resize"
+            style={{ gridColumn: '1 / 2', gridRow: `${2 + i * 2} / ${3 + i * 2}` }}
+            onPointerDown={handleDividerDrag1D(i, 'y')}
+          >
+            <div className="absolute inset-x-1 top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-transparent group-hover:bg-blue-500/40 transition-colors duration-200" />
+          </div>
+        ))}
+
+      {/* Column dividers — grid mode (span all rows) */}
+      {layoutMode === 'grid' && cols > 1 &&
+        Array.from({ length: cols - 1 }, (_, c) => (
+          <div
+            key={`gcol-${c}`}
+            className="relative shrink-0 group w-2 cursor-col-resize"
+            style={{ gridColumn: `${2 + c * 2} / ${3 + c * 2}`, gridRow: `1 / ${rows * 2}` }}
+            onPointerDown={handleGridColDividerDrag(c)}
+          >
+            <div className="absolute inset-y-1 left-1/2 -translate-x-1/2 w-[3px] rounded-full bg-transparent group-hover:bg-blue-500/40 transition-colors duration-200" />
+          </div>
+        ))}
+
+      {/* Row dividers — grid mode (span all columns) */}
+      {layoutMode === 'grid' && rows > 1 &&
+        Array.from({ length: rows - 1 }, (_, r) => (
+          <div
+            key={`grow-${r}`}
+            className="relative shrink-0 group h-2 cursor-row-resize"
+            style={{ gridColumn: `1 / ${cols * 2}`, gridRow: `${2 + r * 2} / ${3 + r * 2}` }}
+            onPointerDown={handleGridRowDividerDrag(r)}
+          >
+            <div className="absolute inset-x-1 top-1/2 -translate-y-1/2 h-[3px] rounded-full bg-transparent group-hover:bg-blue-500/40 transition-colors duration-200" />
+          </div>
+        ))}
 
       {/* Floating drag card */}
       <div
