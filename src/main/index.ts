@@ -2,14 +2,20 @@ import { app, BrowserWindow, session } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { loadWindowState } from './store.js';
-import { registerIpc } from './ipc-handlers.js';
+import { setupGlobalIpc, setupWindowEvents } from './ipc-handlers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+let mainWindow: BrowserWindow | null = null;
+let ipcReady = false;
+
 function createWindow() {
+  if (!ipcReady) return;
+  if (mainWindow && !mainWindow.isDestroyed()) return;
+
   const winState = loadWindowState();
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     title: 'AIpane',
     icon: path.join(__dirname, '../../resources/icon.png'),
     x: winState.x,
@@ -24,20 +30,34 @@ function createWindow() {
     },
   });
 
-  registerIpc(mainWindow);
+  setupWindowEvents(mainWindow);
 
-  if (process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
-  }
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
+
+  const loadPromise = process.env.VITE_DEV_SERVER_URL
+    ? mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL)
+    : mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+
+  loadPromise.then(() => {
+    mainWindow?.show();
+    mainWindow?.focus();
+  }).catch((err) => {
+    console.error('[main] Failed to load renderer:', err);
+  });
 }
 
 app.whenReady().then(() => {
+  setupGlobalIpc();
+  ipcReady = true;
   if (process.platform === 'darwin' && app.dock) {
-    app.dock.setIcon(path.join(__dirname, '../../resources/icon.png'));
+    try {
+      app.dock.setIcon(path.join(__dirname, '../../resources/icon.png'));
+    } catch {
+      // asar 内路径不可直接访问，Dock 图标由 app 图标自动提供
+    }
   }
-  // 伪装为普通 Chrome，避免部分网站检测到 Electron 环境后拦截
   session.defaultSession.setUserAgent(
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
   );
@@ -49,5 +69,5 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  createWindow();
 });

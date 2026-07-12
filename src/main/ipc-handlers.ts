@@ -9,23 +9,25 @@ function computeRowRatios(panelCount: number): number[] {
   return Array.from({ length: rows }, () => 1 / rows);
 }
 
-export function registerIpc(mainWindow: BrowserWindow): void {
-  let settings = loadSettings();
+// ── Module-level settings (loaded once, mutated by IPC handlers) ──
+let settings: AppSettings;
 
-  function broadcast() {
-    mainWindow.webContents.send('settings:changed', settings);
+function broadcastToAll(content: string, data: unknown) {
+  for (const win of BrowserWindow.getAllWindows()) {
+    if (!win.isDestroyed()) win.webContents.send(content, data);
   }
+}
 
-  mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send('settings:init', settings);
-  });
+/** Register once — IPC handlers persist for app lifetime */
+export function setupGlobalIpc(): void {
+  settings = loadSettings();
 
   ipcMain.handle('settings:get', () => settings);
 
   ipcMain.handle('settings:update', (_event, s: AppSettings) => {
     settings = { ...s };
     saveSettings(settings);
-    broadcast();
+    broadcastToAll('settings:changed', settings);
   });
 
   ipcMain.handle('panel:add', (_event, url: string, name?: string) => {
@@ -37,7 +39,7 @@ export function registerIpc(mainWindow: BrowserWindow): void {
     const panelOrder = newPanels.map((_, i) => i);
     settings = { ...settings, panels: newPanels, panelRatios, rowRatios, panelOrder };
     saveSettings(settings);
-    broadcast();
+    broadcastToAll('settings:changed', settings);
     return settings;
   });
 
@@ -48,22 +50,29 @@ export function registerIpc(mainWindow: BrowserWindow): void {
     const panelOrder = newPanels.map((_, i) => i);
     settings = { ...settings, panels: newPanels, panelRatios, rowRatios, panelOrder };
     saveSettings(settings);
-    broadcast();
+    broadcastToAll('settings:changed', settings);
     return settings;
   });
 
   ipcMain.handle('panel:navigate', (_event, id: string, url: string) => {
     settings = { ...settings, panels: settings.panels.map((p) => (p.id === id ? { ...p, url } : p)) };
     saveSettings(settings);
-    broadcast();
+    broadcastToAll('settings:changed', settings);
     return settings;
   });
 
   ipcMain.handle('panel:rename', (_event, id: string, name: string) => {
     settings = { ...settings, panels: settings.panels.map((p) => (p.id === id ? { ...p, name } : p)) };
     saveSettings(settings);
-    broadcast();
+    broadcastToAll('settings:changed', settings);
     return settings;
+  });
+}
+
+/** Register per-window events (called for each new window) */
+export function setupWindowEvents(mainWindow: BrowserWindow): void {
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('settings:init', settings);
   });
 
   mainWindow.on('close', () => {

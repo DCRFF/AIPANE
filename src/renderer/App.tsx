@@ -9,7 +9,9 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
-    window.api.getSettings().then(setSettings);
+    window.api.getSettings().then(setSettings).catch((err: unknown) => {
+      console.error('[renderer] Failed to load settings:', err);
+    });
   }, [setSettings]);
 
   useEffect(() => {
@@ -19,7 +21,7 @@ export default function App() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (!e.ctrlKey && !e.metaKey) return;
-      if (e.key === 't') { e.preventDefault(); window.api.addPanel('about:blank').then(setSettings); }
+      if (e.key === 't') { e.preventDefault(); window.api.addPanel('about:blank').then(setSettings).catch((err: unknown) => console.error('[renderer] Failed to add panel:', err)); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);

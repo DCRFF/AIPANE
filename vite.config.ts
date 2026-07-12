@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), { name: 'remove-crossorigin', apply: 'build', transformIndexHtml: (html) => html.replace(/ crossorigin/g, '') }],
   resolve: {
     dedupe: ['react', 'react-dom'],
     alias: {
@@ -16,6 +16,7 @@ export default defineConfig({
   build: {
     outDir: '../../dist/renderer',
     emptyOutDir: true,
+    modulePreload: false,
   },
   server: {
     port: 5173,
