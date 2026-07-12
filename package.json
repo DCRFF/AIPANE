@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node dev.mjs",
     "build": "node build.mjs",
-    "package": "pnpm build && electron-builder",
+    "package": "node build.mjs && electron-builder",
     "lint": "echo placeholder",
     "typecheck": "tsc --noEmit",
     "test": "echo placeholder"
