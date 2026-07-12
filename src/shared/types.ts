@@ -16,7 +16,7 @@ export interface AppSettings {
 export interface BrowserApi {
   getSettings(): Promise<AppSettings>;
   updateSettings(settings: AppSettings): Promise<void>;
-  addPanel(url: string): Promise<AppSettings>;
+  addPanel(url: string, name?: string): Promise<AppSettings>;
   removePanel(id: string): Promise<AppSettings>;
   navigate(id: string, url: string): Promise<AppSettings>;
   renamePanel(id: string, name: string): Promise<AppSettings>;

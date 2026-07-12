@@ -55,7 +55,7 @@ export default function SettingsPanel() {
   const handleAdd = async () => {
     if (panels.length >= 6) return;
     const url = selectedService?.url ?? 'about:blank';
-    const s = await window.api.addPanel(url);
+    const s = await window.api.addPanel(url, selectedService?.name);
     setSettingsFromMain(s);
   };
 

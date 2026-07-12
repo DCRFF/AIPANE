@@ -28,10 +28,10 @@ export function registerIpc(mainWindow: BrowserWindow): void {
     broadcast();
   });
 
-  ipcMain.handle('panel:add', (_event, url: string) => {
+  ipcMain.handle('panel:add', (_event, url: string, name?: string) => {
     const id = uuid();
-    const name = `面板 ${settings.panels.length + 1}`;
-    const newPanels = [...settings.panels, { id, name, url }];
+    const panelName = name || `面板 ${settings.panels.length + 1}`;
+    const newPanels = [...settings.panels, { id, name: panelName, url }];
     const panelRatios = newPanels.map(() => 1 / newPanels.length);
     const rowRatios = settings.layoutMode === 'grid' ? computeRowRatios(newPanels.length) : [];
     const panelOrder = newPanels.map((_, i) => i);
