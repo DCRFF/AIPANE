@@ -7,6 +7,13 @@ export default function PanelGrid() {
   const panelRatios = useLayoutStore((s) => s.panelRatios);
   const rowRatios = useLayoutStore((s) => s.rowRatios);
   const layoutMode = useLayoutStore((s) => s.layoutMode);
+  const panelOrder = useLayoutStore((s) => s.panelOrder);
+
+  // Normalize: fallback to identity if panelOrder is stale/missing
+  const order =
+    panelOrder.length === panels.length
+      ? panelOrder
+      : panels.map((_, i) => i);
 
   const cols = Math.ceil(Math.sqrt(panels.length));
   const rows = Math.ceil(panels.length / cols);
@@ -168,22 +175,18 @@ export default function PanelGrid() {
         }
         if (targetIndex !== dragRef.current.index) {
           const state = useLayoutStore.getState();
-          const newPanels = [...state.panels];
-          const newRatios = [...state.panelRatios];
-          [newPanels[dragRef.current.index], newPanels[targetIndex]] = [
-            newPanels[targetIndex],
-            newPanels[dragRef.current.index],
+          const newOrder = [...(state.panelOrder.length === state.panels.length ? state.panelOrder : state.panels.map((_, idx) => idx))];
+          [newOrder[dragRef.current.index], newOrder[targetIndex]] = [
+            newOrder[targetIndex],
+            newOrder[dragRef.current.index],
           ];
-          [newRatios[dragRef.current.index], newRatios[targetIndex]] = [
-            newRatios[targetIndex],
-            newRatios[dragRef.current.index],
-          ];
-          useLayoutStore.setState({ panels: newPanels, panelRatios: newRatios });
+          useLayoutStore.setState({ panelOrder: newOrder });
           window.api.updateSettings({
-            panels: newPanels,
+            panels: state.panels,
             layoutMode: state.layoutMode,
-            panelRatios: newRatios,
+            panelRatios: state.panelRatios,
             rowRatios: state.rowRatios,
+            panelOrder: newOrder,
           });
         }
       }
@@ -281,27 +284,31 @@ export default function PanelGrid() {
       className="flex-1 p-2 overflow-hidden"
       style={containerStyle}
     >
-      {panels.map((panel, i) => (
+      {panels.map((panel, i) => {
+        const vp = order[i];
+        return (
         <div
           key={panel.id}
           data-panel
           data-panel-index={i}
           className="flex min-w-0 min-h-0 overflow-hidden"
-          style={
-            isGrid
-              ? getPanelGridStyle(i)
-              : { flex: `${validRatios[i]} 1 0%` }
-          }
+          style={{
+            order: vp,
+            ...(isGrid
+              ? getPanelGridStyle(vp)
+              : { flex: `${validRatios[vp]} 1 0%` }),
+          }}
         >
           <PanelView
             panelId={panel.id}
             panelUrl={panel.url}
-            needsPadding={needsPadding(i)}
+            needsPadding={needsPadding(vp)}
             index={i}
             onDragStart={handleDragStart}
           />
         </div>
-      ))}
+      );
+      })}
 
       {/* Flex-mode dividers */}
       {!isGrid &&

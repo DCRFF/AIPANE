@@ -34,7 +34,8 @@ export function registerIpc(mainWindow: BrowserWindow): void {
     const newPanels = [...settings.panels, { id, name, url }];
     const panelRatios = newPanels.map(() => 1 / newPanels.length);
     const rowRatios = settings.layoutMode === 'grid' ? computeRowRatios(newPanels.length) : [];
-    settings = { ...settings, panels: newPanels, panelRatios, rowRatios };
+    const panelOrder = newPanels.map((_, i) => i);
+    settings = { ...settings, panels: newPanels, panelRatios, rowRatios, panelOrder };
     saveSettings(settings);
     broadcast();
     return settings;
@@ -44,7 +45,8 @@ export function registerIpc(mainWindow: BrowserWindow): void {
     const newPanels = settings.panels.filter((p) => p.id !== id);
     const panelRatios = newPanels.map(() => 1 / newPanels.length);
     const rowRatios = settings.layoutMode === 'grid' ? computeRowRatios(newPanels.length) : [];
-    settings = { ...settings, panels: newPanels, panelRatios, rowRatios };
+    const panelOrder = newPanels.map((_, i) => i);
+    settings = { ...settings, panels: newPanels, panelRatios, rowRatios, panelOrder };
     saveSettings(settings);
     broadcast();
     return settings;

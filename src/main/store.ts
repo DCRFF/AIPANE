@@ -18,6 +18,7 @@ const store = new Store<{ settings: AppSettings; windowState: WindowState }>({
       layoutMode: 'horizontal' as const,
       panelRatios: [0.5, 0.5],
       rowRatios: [],
+      panelOrder: [0, 1],
     },
     windowState: { width: 1400, height: 900 },
   },

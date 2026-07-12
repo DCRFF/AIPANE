@@ -29,7 +29,7 @@ export default function PanelView({ panelId, panelUrl, needsPadding, index, onDr
   return (
     <div
       data-panel-index={index}
-      className="flex flex-col flex-1 min-w-0 rounded-xl overflow-hidden shadow-lg shadow-black/30 border border-gray-700/40 transition-all duration-150"
+      className="flex flex-col flex-1 min-w-0 rounded-xl overflow-hidden shadow-lg shadow-black/30 border border-gray-700/40"
     >
       <div
         className={`h-8 bg-gray-800/90 flex items-center gap-1 px-2 shrink-0 ${needsPadding ? 'pr-[72px]' : ''} cursor-grab`}

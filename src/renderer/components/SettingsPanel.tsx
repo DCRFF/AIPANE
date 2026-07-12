@@ -7,9 +7,21 @@ const LAYOUT_MODES = [
   { value: 'grid' as const, label: '田字' },
 ];
 
+const AI_SERVICES = [
+  { name: 'DeepSeek',   url: 'https://chat.deepseek.com/' },
+  { name: '豆包',        url: 'https://www.doubao.com/' },
+  { name: 'ChatGPT',    url: 'https://chatgpt.com/' },
+  { name: 'Claude',     url: 'https://claude.ai/' },
+  { name: 'Gemini',     url: 'https://gemini.google.com/' },
+  { name: '通义千问',    url: 'https://tongyi.aliyun.com/' },
+  { name: 'Kimi',       url: 'https://kimi.moonshot.cn/' },
+  { name: 'Perplexity', url: 'https://www.perplexity.ai/' },
+];
+
 export default function SettingsPanel() {
   const panels = useLayoutStore((s) => s.panels);
   const layoutMode = useLayoutStore((s) => s.layoutMode);
+  const panelOrder = useLayoutStore((s) => s.panelOrder);
   const setSettingsFromMain = useLayoutStore((s) => s.setSettings);
 
   const [localUrls, setLocalUrls] = useState<Record<string, string>>(() => {
@@ -22,6 +34,7 @@ export default function SettingsPanel() {
     panels.forEach((p) => (map[p.id] = p.name));
     return map;
   });
+  const [selectedService, setSelectedService] = useState<{ name: string; url: string } | null>(null);
 
   const handleUrlChange = (id: string, url: string) => {
     setLocalUrls((prev) => ({ ...prev, [id]: url }));
@@ -41,16 +54,26 @@ export default function SettingsPanel() {
 
   const handleAdd = async () => {
     if (panels.length >= 6) return;
-    const s = await window.api.addPanel('about:blank');
+    const url = selectedService?.url ?? 'about:blank';
+    const s = await window.api.addPanel(url);
     setSettingsFromMain(s);
+  };
+
+  const handleQuickAdd = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const url = e.target.value;
+    if (!url) {
+      setSelectedService(null);
+      return;
+    }
+    const svc = AI_SERVICES.find((s) => s.url === url);
+    if (svc) setSelectedService(svc);
   };
 
   const handleLayoutMode = async (mode: 'horizontal' | 'vertical' | 'grid') => {
     const panelRatios = panels.map(() => 1 / panels.length);
     const cols = Math.ceil(Math.sqrt(panels.length));
     const rows = Math.ceil(panels.length / cols);
-    const rowRatios = mode === 'grid' ? Array.from({ length: rows }, () => 1 / rows) : [];
-    const newSettings = { panels, layoutMode: mode, panelRatios, rowRatios };
+    const newSettings = { panels, layoutMode: mode, panelRatios, rowRatios, panelOrder };
     await window.api.updateSettings(newSettings);
     setSettingsFromMain(newSettings);
   };
@@ -60,7 +83,25 @@ export default function SettingsPanel() {
 
       <div className="mb-6">
         <label className="block text-sm text-gray-400 mb-2">面板数量 ({panels.length}/6)</label>
-        <button onClick={handleAdd} disabled={panels.length >= 6} className="px-3 py-1 bg-gray-700 text-white rounded disabled:opacity-30">+</button>
+        <div className="flex items-center gap-2">
+          <select
+            onChange={handleQuickAdd}
+            value={selectedService?.url ?? ''}
+            disabled={panels.length >= 6}
+            className="px-2 py-1 bg-gray-700 text-white text-sm rounded disabled:opacity-30 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">选择AI服务</option>
+            {AI_SERVICES.map((s) => (
+              <option key={s.url} value={s.url}>{s.name}</option>
+            ))}
+          </select>
+          <button onClick={handleAdd} disabled={panels.length >= 6} className="px-3 py-1 bg-gray-700 text-white rounded disabled:opacity-30">+</button>
+        </div>
+        {selectedService && (
+          <div className="mt-1 text-xs text-gray-500">
+            {selectedService.name} — {selectedService.url}
+          </div>
+        )}
       </div>
 
       <div className="mb-6">

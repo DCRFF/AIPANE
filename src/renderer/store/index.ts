@@ -11,6 +11,7 @@ export const useLayoutStore = create<LayoutStore>((set) => ({
   layoutMode: 'horizontal',
   panelRatios: [],
   rowRatios: [],
-  setSettings: (settings) => set({ panels: settings.panels, layoutMode: settings.layoutMode, panelRatios: settings.panelRatios, rowRatios: settings.rowRatios ?? [] }),
+  panelOrder: [],
+  setSettings: (settings) => set({ panels: settings.panels, layoutMode: settings.layoutMode, panelRatios: settings.panelRatios, rowRatios: settings.rowRatios ?? [], panelOrder: settings.panelOrder ?? [] }),
   setRowRatios: (ratios) => set({ rowRatios: ratios }),
 }));
