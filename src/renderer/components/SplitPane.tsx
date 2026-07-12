@@ -23,6 +23,9 @@ export default function SplitPane({ direction, ratios, onRatiosChange, children 
     const totalSize = axis === 'x' ? container.clientWidth : container.clientHeight;
     const pairSum = startRatios[index] + startRatios[index + 1];
 
+    let latestAdjLeft = startRatios[index];
+    let latestAdjRight = startRatios[index + 1];
+
     const onMove = (ev: PointerEvent) => {
       const currentPos = axis === 'x' ? ev.clientX : ev.clientY;
       const delta = currentPos - startPos;
@@ -31,15 +34,13 @@ export default function SplitPane({ direction, ratios, onRatiosChange, children 
       const rightRatio = Math.max(0.1, startRatios[index + 1] - deltaRatio);
       const newPairSum = leftRatio + rightRatio;
       const scale = pairSum / newPairSum;
-      const adjLeft = leftRatio * scale;
-      const adjRight = rightRatio * scale;
+      latestAdjLeft = leftRatio * scale;
+      latestAdjRight = rightRatio * scale;
 
-      for (let i = 0; i < children.length; i++) {
-        const el = container.children[i * 2] as HTMLElement;
-        if (i === index) el.style.flex = `${adjLeft}`;
-        else if (i === index + 1) el.style.flex = `${adjRight}`;
-        else el.style.flex = `${startRatios[i]}`;
-      }
+      const leftEl = container.children[index * 2] as HTMLElement;
+      const rightEl = container.children[(index + 1) * 2] as HTMLElement;
+      leftEl.style.flex = `${latestAdjLeft}`;
+      rightEl.style.flex = `${latestAdjRight}`;
     };
 
     const onUp = () => {
@@ -47,19 +48,9 @@ export default function SplitPane({ direction, ratios, onRatiosChange, children 
       grip.removeEventListener('pointerup', onUp);
       grip.releasePointerCapture(e.pointerId);
 
-      const newRatios: number[] = [];
-      let sum = 0;
-      for (let i = 0; i < children.length; i++) {
-        const el = container.children[i * 2] as HTMLElement;
-        const val = parseFloat(el.style.flex) || ratios[i];
-        newRatios.push(val);
-        sum += val;
-        el.style.flex = '';
-      }
-      if (sum > 0 && Math.abs(sum - 1) > 0.001) {
-        // re-normalize
-        for (let i = 0; i < newRatios.length; i++) newRatios[i] /= sum;
-      }
+      const newRatios = [...startRatios];
+      newRatios[index] = latestAdjLeft;
+      newRatios[index + 1] = latestAdjRight;
       onRatiosChange(newRatios);
     };
 

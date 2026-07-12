@@ -57,3 +57,11 @@ Vitest（单元） + Playwright（E2E + Electron）
 
 执行计划：[docs/plan/26-07-09-01-执行计划.md](../docs/plan/26-07-09-01-执行计划.md)
 设计背景：[docs/report/26-07-09-01-项目计划.md](../docs/report/26-07-09-01-项目计划.md)
+
+## Bug 修复 / 特性开发约定
+
+- 修复 bug 或完成特性开发后，**必须打开应用让用户查看效果**。
+- 重新构建并启动生产模式的命令：
+  ```bash
+  pkill -f "Electron.app" 2>/dev/null; node build.mjs && ./node_modules/.bin/electron .
+  ```

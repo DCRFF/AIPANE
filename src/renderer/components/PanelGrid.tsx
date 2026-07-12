@@ -37,14 +37,16 @@ export default function PanelGrid() {
       <div className="flex-1 p-2 flex overflow-hidden" style={{ flexDirection: 'column' }}>
         <SplitPane direction="vertical" ratios={effRowRatios} onRatiosChange={handleRowRatios}>
           {panelRows.map((rowPanels, rowIdx) => {
-            const rowPanelRatios = rowPanels.map(
+            const rawRatios = rowPanels.map(
               (_, ci) => panelRatios[rowIdx * cols + ci] ?? 1 / rowPanels.length,
             );
+            const rowSum = rawRatios.reduce((a, b) => a + b, 0) || 1;
+            const rowPanelRatios = rawRatios.map((r) => r / rowSum);
             const handleRowPanelRatios = (r: number[]) => {
               const newRatios = [...panelRatios];
               for (let ci = 0; ci < r.length; ci++) {
                 const pi = rowIdx * cols + ci;
-                if (pi < newRatios.length) newRatios[pi] = r[ci];
+                if (pi < newRatios.length) newRatios[pi] = r[ci] * rowSum;
               }
               useLayoutStore.setState({ panelRatios: newRatios });
             };
