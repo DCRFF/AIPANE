@@ -48,7 +48,7 @@ pnpm test      # 测试
 - **共享类型**放 `src/shared/types.ts`，main 和 renderer 不能互相 import
 - **命名**：目录 kebab-case，组件 PascalCase，工具 camelCase
 - **样式**：Tailwind CSS，全程统一
-- **README 双语文档**：`README.md`（中文）和 `README.en.md`（英文）保持同步，每次 git 提交前需更新两份文档
+- **README 双语文档**：`README.md`（英文）为主，`README_zh.md`（中文）保持同步，每次 git 提交前需更新两份文档
 
 ## 测试
 
