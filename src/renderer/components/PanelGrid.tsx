@@ -408,6 +408,7 @@ export default function PanelGrid() {
   // ── Needs padding for settings button ──
   const needsPadding = (vp: number) => {
     if (layoutMode === 'vertical') return vp === 0;
+    if (layoutMode === 'horizontal') return vp === panels.length - 1;
     if (layoutMode === 'grid') {
       // settings button is top-right; padding for top-right panel
       const col = vp % cols;
