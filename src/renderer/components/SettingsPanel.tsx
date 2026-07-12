@@ -46,12 +46,13 @@ export default function SettingsPanel() {
   };
 
   const handleLayoutMode = async (mode: 'horizontal' | 'vertical' | 'grid') => {
-    await window.api.updateSettings({
-      panels,
-      layoutMode: mode,
-      panelRatios: panels.map(() => 1 / panels.length),
-    });
-    setSettingsFromMain({ panels, layoutMode: mode, panelRatios: panels.map(() => 1 / panels.length) });
+    const panelRatios = panels.map(() => 1 / panels.length);
+    const cols = Math.ceil(Math.sqrt(panels.length));
+    const rows = Math.ceil(panels.length / cols);
+    const rowRatios = mode === 'grid' ? Array.from({ length: rows }, () => 1 / rows) : [];
+    const newSettings = { panels, layoutMode: mode, panelRatios, rowRatios };
+    await window.api.updateSettings(newSettings);
+    setSettingsFromMain(newSettings);
   };
 
   return (

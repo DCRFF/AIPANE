@@ -3,6 +3,12 @@ import { v4 as uuid } from 'uuid';
 import { loadSettings, saveSettings, loadWindowState, saveWindowState } from './store.js';
 import type { AppSettings } from '../shared/types.js';
 
+function computeRowRatios(panelCount: number): number[] {
+  const cols = Math.ceil(Math.sqrt(panelCount));
+  const rows = Math.ceil(panelCount / cols);
+  return Array.from({ length: rows }, () => 1 / rows);
+}
+
 export function registerIpc(mainWindow: BrowserWindow): void {
   let settings = loadSettings();
 
@@ -25,7 +31,10 @@ export function registerIpc(mainWindow: BrowserWindow): void {
   ipcMain.handle('panel:add', (_event, url: string) => {
     const id = uuid();
     const name = `面板 ${settings.panels.length + 1}`;
-    settings = { ...settings, panels: [...settings.panels, { id, name, url }], panelRatios: settings.panels.map(() => 1 / (settings.panels.length + 1)) };
+    const newPanels = [...settings.panels, { id, name, url }];
+    const panelRatios = newPanels.map(() => 1 / newPanels.length);
+    const rowRatios = settings.layoutMode === 'grid' ? computeRowRatios(newPanels.length) : [];
+    settings = { ...settings, panels: newPanels, panelRatios, rowRatios };
     saveSettings(settings);
     broadcast();
     return settings;
@@ -33,7 +42,9 @@ export function registerIpc(mainWindow: BrowserWindow): void {
 
   ipcMain.handle('panel:remove', (_event, id: string) => {
     const newPanels = settings.panels.filter((p) => p.id !== id);
-    settings = { ...settings, panels: newPanels, panelRatios: newPanels.map(() => 1 / newPanels.length) };
+    const panelRatios = newPanels.map(() => 1 / newPanels.length);
+    const rowRatios = settings.layoutMode === 'grid' ? computeRowRatios(newPanels.length) : [];
+    settings = { ...settings, panels: newPanels, panelRatios, rowRatios };
     saveSettings(settings);
     broadcast();
     return settings;

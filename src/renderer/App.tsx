@@ -37,13 +37,17 @@ export default function App() {
           <span>⚙</span>
         </span>
       </button>
-      {showSettings && (
-        <div className="fixed inset-0 z-40 pointer-events-auto" onClick={() => setShowSettings(false)}>
-          <div className="absolute top-0 right-0 w-96 h-full bg-gray-800 border-l border-gray-700" onClick={(e) => e.stopPropagation()}>
-            <SettingsPanel />
-          </div>
+      <div
+        className={`fixed inset-0 z-40 transition-all duration-300 ease-out ${showSettings ? 'bg-black/40 pointer-events-auto' : 'bg-transparent pointer-events-none'}`}
+        onClick={() => setShowSettings(false)}
+      >
+        <div
+          className={`absolute top-0 right-0 w-96 h-full bg-gray-800 border-l border-gray-700 rounded-l-xl transition-transform duration-300 ease-out ${showSettings ? 'translate-x-0' : 'translate-x-full'}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <SettingsPanel />
         </div>
-      )}
+      </div>
     </div>
   );
 }

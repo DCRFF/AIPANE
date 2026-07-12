@@ -9,6 +9,7 @@ export interface AppSettings {
   panels: PanelConfig[];
   layoutMode: 'horizontal' | 'vertical' | 'grid';
   panelRatios: number[];
+  rowRatios: number[];
 }
 
 export interface BrowserApi {

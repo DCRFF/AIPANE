@@ -16,6 +16,7 @@ const store = new Store<{ settings: AppSettings; windowState: WindowState }>({
         { id: uuid(), name: 'DeepSeek', url: 'https://chat.deepseek.com/' },
       ],
       layoutMode: 'horizontal' as const,
+      rowRatios: [],
     },
     windowState: { width: 1400, height: 900 },
   },
