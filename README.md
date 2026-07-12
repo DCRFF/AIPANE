@@ -1,6 +1,6 @@
 # AIpane
 
-> A multi-panel browser in a single window — browse multiple webpages side by side, no tab switching needed.
+> A multi-panel browser built for AI — compare responses from DeepSeek, ChatGPT, Claude, Gemini, and more side by side in a single window.
 
 <p align="center">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey" alt="Platform">
@@ -10,16 +10,21 @@
 
 [中文](README_zh.md) | English
 
+## Why AIpane?
+
+When working with AI, one answer is rarely enough. AIpane lets you ask the same question to multiple AI services at once, compare outputs, and pick the best — without juggling tabs or windows.
+
 ## Features
 
-- **Multi-panel browsing** — 1 to 6 independent webviews, each with isolated navigation
-- **Three layouts** — horizontal / vertical / grid, switch anytime
-- **Drag-to-resize** — freely adjust panel proportions with split handles
-- **Drag-to-reorder** — drag the address bar to swap panel positions
-- **Quick AI service launcher** — one-click open DeepSeek, ChatGPT, Claude, Gemini, and more
-- **Address bar** — URL navigation, back, forward, refresh
-- **Auto-save** — all config (layout, panels, URLs) persisted and restored on restart
-- **Keyboard shortcuts** — `Ctrl+T` / `Cmd+T` to add a new panel
+- **Side-by-side AI comparison** — ask DeepSeek, ChatGPT, Claude, Gemini, and more simultaneously
+- **1–6 independent panels** — each with its own webview, each navigating independently
+- **Three layouts** — horizontal, vertical, or grid; switch anytime
+- **Drag-to-resize** — adjust panel proportions with split handles
+- **Drag-to-reorder** — drag the address bar to rearrange panels
+- **One-click AI launcher** — add panels pre-loaded with popular AI services
+- **Address bar** — full URL navigation with back, forward, and refresh
+- **Auto-save** — layout, panels, and URLs persist across restarts
+- **Keyboard shortcuts** — `Ctrl+T` / `Cmd+T` for a new panel
 
 ## Quick Start
 

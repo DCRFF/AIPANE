@@ -1,6 +1,6 @@
 # AIpane
 
-> 单窗口多面板浏览器 —— 像窗格一样并排浏览多个网页，无需来回切换标签页。
+> 专为 AI 打造的多面板浏览器 —— 同时对比 DeepSeek、ChatGPT、Claude、Gemini 等多个 AI 的回答，一个窗口搞定。
 
 <p align="center">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey" alt="Platform">
@@ -10,15 +10,20 @@
 
 [English](README.md) | 中文
 
+## 为什么用 AIpane？
+
+和 AI 协作时，一个答案往往不够。AIpane 让你同时向多个 AI 服务提问，横向对比输出，选出最优解 —— 无需来回切换标签页。
+
 ## 功能
 
-- **多面板并排** — 1 到 6 个独立 webview，各自浏览互不干扰
+- **AI 回答并排对比** — 同时向 DeepSeek、ChatGPT、Claude、Gemini 等提问并对比结果
+- **1–6 个独立面板** — 各自独立的 webview，互不干扰
 - **三种布局** — 横向 / 纵向 / 田字，随时切换
 - **拖拽分割线** — 自由调整面板比例
-- **拖拽排序** — 拖地址栏即可交换面板位置
-- **AI 服务快捷添加** — 一键打开 DeepSeek、豆包、ChatGPT、Claude 等
-- **地址栏导航** — 支持 URL 输入、前进、后退、刷新
-- **自动保存** — 所有配置（布局、面板、URL）自动持久化，重启恢复
+- **拖拽排序** — 拖地址栏交换面板位置
+- **AI 服务一键添加** — 预置常用 AI 服务，一键打开
+- **地址栏导航** — 完整 URL 导航，支持前进、后退、刷新
+- **自动保存** — 布局、面板、URL 重启后自动恢复
 - **快捷键** — `Ctrl+T` / `Cmd+T` 新建面板
 
 ## 快速开始
