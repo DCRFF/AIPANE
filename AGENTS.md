@@ -53,24 +53,12 @@ pnpm test      # 测试
 
 Vitest（单元） + Playwright（E2E + Electron）
 
-## 文档
-
-执行计划：[docs/plan/26-07-09-01-执行计划.md](../docs/plan/26-07-09-01-执行计划.md)
-设计背景：[docs/report/26-07-09-01-项目计划.md](../docs/report/26-07-09-01-项目计划.md)
-Bug 分析：[docs/report/26-07-12-01-SplitPane-bug分析.md](../docs/report/26-07-12-01-SplitPane-bug分析.md)
-拖拽排序方案：[docs/report/26-07-12-02-面板拖拽排序方案.md](../docs/report/26-07-12-02-面板拖拽排序方案.md)
-CSS Grid 方案分析：[docs/report/26-07-12-03-CSSGrid布局方案分析.md](../docs/report/26-07-12-03-CSSGrid布局方案分析.md)
-切换布局方案调研：[docs/report/26-07-12-04-切换布局方案调研.md](../docs/report/26-07-12-04-切换布局方案调研.md)
-布局改造计划：[docs/plan/26-07-12-01-面板池布局改造计划.md](../docs/plan/26-07-12-01-面板池布局改造计划.md)
 
 ## 已实现功能
 
 - 横向 / 纵向 / 田字三种布局
 - 分割线拖拽调整面板比例
-- **卡片式拖拽排序**：拖拽地址栏交换面板位置，零 React 重渲染，pointer capture 防 webview 吞事件
+- **卡片式拖拽排序**：拖拽地址栏交换面板位置
+- **面板池布局**：切换布局 webview 不重载（CSS Grid + Flex 单渲染路径）
 - 面板增删（1-6 个），配置自动持久化
 - 快捷键 `Ctrl+T` 新建面板
-
-## 待实施
-
-- [面板池布局改造](docs/plan/26-07-12-01-面板池布局改造计划.md)：解决切换布局时 webview 重载问题
