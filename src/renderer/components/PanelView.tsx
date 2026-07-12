@@ -28,7 +28,6 @@ export default function PanelView({ panelId, panelUrl, needsPadding, index, onDr
 
   return (
     <div
-      data-panel
       data-panel-index={index}
       className="flex flex-col flex-1 min-w-0 rounded-xl overflow-hidden shadow-lg shadow-black/30 border border-gray-700/40 transition-all duration-150"
     >
