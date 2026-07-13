@@ -31,6 +31,7 @@ export function setupGlobalIpc(): void {
   });
 
   ipcMain.handle('panel:add', (_event, url: string, name?: string) => {
+    if (settings.panels.length >= 6) return settings;
     const id = randomUUID();
     const panelName = name || `面板 ${settings.panels.length + 1}`;
     const newPanels = [...settings.panels, { id, name: panelName, url }];
@@ -44,6 +45,7 @@ export function setupGlobalIpc(): void {
   });
 
   ipcMain.handle('panel:remove', (_event, id: string) => {
+    if (settings.panels.length <= 1) return settings;
     const newPanels = settings.panels.filter((p) => p.id !== id);
     const panelRatios = newPanels.map(() => 1 / newPanels.length);
     const rowRatios = settings.layoutMode === 'grid' ? computeRowRatios(newPanels.length) : [];
