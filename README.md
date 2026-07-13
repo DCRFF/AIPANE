@@ -25,6 +25,19 @@ When working with AI, one answer is rarely enough. AIpane lets you ask the same 
 - **Address bar** — full URL navigation with back, forward, and refresh
 - **Auto-save** — layout, panels, and URLs persist across restarts
 - **Keyboard shortcuts** — `Ctrl+T` / `Cmd+T` for a new panel
+
+## Screenshots
+
+<p align="center">
+  <img src="resources/app-multipanel.png" alt="Multi-panel AI comparison" width="80%">
+  <br><em>Compare AI responses side by side</em>
+</p>
+
+<p align="center">
+  <img src="resources/app-settings.png" alt="Custom AI services settings" width="80%">
+  <br><em>Manage custom AI services</em>
+</p>
+
 ## Quick Start
 
 **Prerequisites:** Node.js ≥ 18, pnpm ≥ 8

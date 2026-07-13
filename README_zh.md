@@ -25,6 +25,19 @@
 - **地址栏导航** — 完整 URL 导航，支持前进、后退、刷新
 - **自动保存** — 布局、面板、URL 重启后自动恢复
 - **快捷键** — `Ctrl+T` / `Cmd+T` 新建面板
+
+## 截图
+
+<p align="center">
+  <img src="resources/app-multipanel.png" alt="多面板 AI 对比" width="80%">
+  <br><em>并排对比多个 AI 的回答</em>
+</p>
+
+<p align="center">
+  <img src="resources/app-settings.png" alt="自定义 AI 服务管理" width="80%">
+  <br><em>管理自定义 AI 服务</em>
+</p>
+
 ## 快速开始
 
 **前置条件：** Node.js ≥ 18，pnpm ≥ 8
