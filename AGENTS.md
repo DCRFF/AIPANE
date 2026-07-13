@@ -1,5 +1,7 @@
 # 仓库指南
 
+> 行为规范见 [.omp/RULES.md](.omp/RULES.md)
+
 ## 项目
 
 AIpane —— Electron + React + TypeScript 桌面应用。单一窗口内通过 webview 并排打开 1-6 个网页，各栏独立浏览。设置面板为内联覆盖层，从窗口右上角齿轮按钮唤出。
