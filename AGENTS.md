@@ -1,7 +1,14 @@
 # 仓库指南
 
-> 行为规范见 [.omp/RULES.md](.omp/RULES.md)
+## 行为规范
 
+- **Git 提交格式**：`type: [YYYY-MM-DD] 简短描述`，type 为 `feat`/`fix`/`docs`/`chore`/`refactor`/`test` 等，描述用英文
+- **双语文档**：`README.md` 为主，`README_zh.md` 保持同步；内部文档（docs/plan/、docs/report/）用中文
+- **文档命名**：`docs/` 下文件格式 `YY-MM-DD-0X-描述.md`，`0X` 为当天第 X 份（01 起），描述用中文
+- **禁止提交 gitignore 内容**：`.gitignore` 中列出的目录和文件一律不得 `git add`
+- **禁止自主 git 操作**：未经明确授权，禁止任何 git 操作（commit/push/rebase 等）
+
+---
 ## 项目
 
 AIpane —— Electron + React + TypeScript 桌面应用。单一窗口内通过 webview 并排打开 1-6 个网页，各栏独立浏览。设置面板为内联覆盖层，从窗口右上角齿轮按钮唤出。
