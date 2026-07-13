@@ -37,9 +37,18 @@ pnpm install
 # 开发模式（含 HMR 热更新）
 pnpm dev
 
-# 生产模式（更稳定，无 HMR）
+# 生产模式（无 HMR，更接近打包后的效果）
 node build.mjs && ./node_modules/.bin/electron .
 ```
+
+### 开发 vs 生产模式
+
+| | 开发模式 | 生产模式 |
+|---|---|---|
+| 渲染层 | Vite HMR，改动即时生效 | 构建产物，需重新构建 |
+| 主进程 | 重启 Electron | 重新构建 + 重启 |
+| 加载方式 | `http://localhost:5173` | `file://` |
+| 适用场景 | 调 UI、调样式 | 调主进程、打包前验证 |
 
 ## 打包发布
 
