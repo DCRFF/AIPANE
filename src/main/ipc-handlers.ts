@@ -37,7 +37,7 @@ export function setupGlobalIpc(): void {
     const newPanels = [...settings.panels, { id, name: panelName, url }];
     const panelRatios = newPanels.map(() => 1 / newPanels.length);
     const rowRatios = settings.layoutMode === 'grid' ? computeRowRatios(newPanels.length) : [];
-    const panelOrder = newPanels.map((_, i) => i);
+    const panelOrder = [...settings.panelOrder, newPanels.length - 1];
     settings = { ...settings, panels: newPanels, panelRatios, rowRatios, panelOrder };
     saveSettings(settings);
     broadcastToAll('settings:changed', settings);
@@ -46,10 +46,14 @@ export function setupGlobalIpc(): void {
 
   ipcMain.handle('panel:remove', (_event, id: string) => {
     if (settings.panels.length <= 1) return settings;
+    const removedIdx = settings.panels.findIndex(p => p.id === id);
+    if (removedIdx === -1) return settings;
     const newPanels = settings.panels.filter((p) => p.id !== id);
     const panelRatios = newPanels.map(() => 1 / newPanels.length);
     const rowRatios = settings.layoutMode === 'grid' ? computeRowRatios(newPanels.length) : [];
-    const panelOrder = newPanels.map((_, i) => i);
+    const panelOrder = settings.panelOrder
+        .filter(i => i !== removedIdx)
+        .map(i => i > removedIdx ? i - 1 : i);
     settings = { ...settings, panels: newPanels, panelRatios, rowRatios, panelOrder };
     saveSettings(settings);
     broadcastToAll('settings:changed', settings);
