@@ -37,9 +37,18 @@ pnpm install
 # Development mode (with HMR)
 pnpm dev
 
-# Production mode (more stable, no HMR)
+# Production mode (no HMR, closer to packaged app)
 node build.mjs && ./node_modules/.bin/electron .
 ```
+
+### Dev vs Production
+
+| | Dev | Production |
+|---|---|---|
+| Renderer | Vite HMR — changes instant | Built files — rebuild required |
+| Main process | Restart Electron | Rebuild + restart |
+| Loads from | `http://localhost:5173` | `file://` |
+| Use for | UI tweaks, styling | Main process work, pre-package check |
 
 ## Packaging
 

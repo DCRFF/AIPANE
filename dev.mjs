@@ -67,6 +67,7 @@ async function main() {
   cpSync('src/settings', 'dist/settings', { recursive: true });
   console.log('[dev] settings copied');
   await startVite();
+  startElectron();
 }
 
 main().catch((err) => {

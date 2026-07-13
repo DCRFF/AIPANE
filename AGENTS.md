@@ -23,15 +23,39 @@ src/
 
 ## 启动方式
 
-**开发模式**（含 HMR）：
+### 开发模式（dev）
+
 ```bash
-pnpm dev
+pnpm dev          # 或 node dev.mjs
 ```
 
-**生产模式**（直接启动，无 HMR，更稳定）：
+- esbuild 构建 main + preload → `dist/`
+- Vite dev server 启动，渲染层通过 `http://localhost:5173` 加载
+- Electron 窗口自动打开，加载 Vite 页面
+- **渲染层改动即时生效（HMR）**，无需重启
+- **主进程 / preload 改动需重启**（关闭 Electron 窗口，重新 `pnpm dev`）
+
+### 生产模式（prod）
+
 ```bash
 node build.mjs && ./node_modules/.bin/electron .
 ```
+
+- esbuild 构建 main + preload → `dist/`；Vite 构建渲染层 → `dist/renderer/`
+- Electron 从 `dist/` 文件系统加载（`file://` 协议），无 dev server
+- **任何代码改动都需要重新构建 + 重启**
+- 更稳定，无 HMR 干扰，接近最终用户环境
+
+**模式对比：**
+
+| | Dev | Prod |
+|---|---|---|
+| 渲染层 | Vite HMR，即时生效 | 构建产物，需重建 |
+| 主进程 | 需重启 | 需重建+重启 |
+| 加载方式 | `http://localhost:5173` | `file://` |
+| 适用场景 | 调 UI、调样式 | 验主进程、打包前验证 |
+
+**其他命令：**
 
 **其他命令**：
 ```bash
