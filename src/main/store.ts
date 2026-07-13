@@ -19,13 +19,15 @@ const store = new Store<{ settings: AppSettings; windowState: WindowState }>({
       panelRatios: [0.5, 0.5],
       rowRatios: [],
       panelOrder: [0, 1],
+      aiServices: [],
     },
     windowState: { width: 1400, height: 900 },
   },
 });
 
 export function loadSettings(): AppSettings {
-  return store.get('settings');
+  const s = store.get('settings');
+  return { ...s, aiServices: s.aiServices ?? [] };
 }
 
 export function saveSettings(settings: AppSettings): void {

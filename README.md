@@ -21,11 +21,10 @@ When working with AI, one answer is rarely enough. AIpane lets you ask the same 
 - **Three layouts** — horizontal, vertical, or grid; switch anytime
 - **Drag-to-resize** — adjust panel proportions with split handles
 - **Drag-to-reorder** — drag the address bar to rearrange panels
-- **One-click AI launcher** — add panels pre-loaded with popular AI services
+- **Custom AI services** — 8 built-in presets (DeepSeek, ChatGPT, Claude, etc.) plus your own services (Ollama, self-hosted LLMs, etc.) — add, edit, and delete freely, persisted across restarts
 - **Address bar** — full URL navigation with back, forward, and refresh
 - **Auto-save** — layout, panels, and URLs persist across restarts
 - **Keyboard shortcuts** — `Ctrl+T` / `Cmd+T` for a new panel
-
 ## Quick Start
 
 **Prerequisites:** Node.js ≥ 18, pnpm ≥ 8

@@ -106,3 +106,5 @@ Vitest（单元） + Playwright（E2E + Electron）
 - **面板池布局**：切换布局 webview 不重载（CSS Grid + Flex 单渲染路径）
 - 面板增删（1-6 个），配置自动持久化
 - 快捷键 `Ctrl+T` 新建面板
+
+- **AI 服务配置管理**：预设8个主流 AI 服务 + 用户可自定义增删改服务，数据持久化
