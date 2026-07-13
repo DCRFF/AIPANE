@@ -32,6 +32,11 @@ function createWindow() {
 
   setupWindowEvents(mainWindow);
 
+  mainWindow.once('ready-to-show', () => {
+    mainWindow?.show();
+    mainWindow?.focus();
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
@@ -40,10 +45,7 @@ function createWindow() {
     ? mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL)
     : mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
 
-  loadPromise.then(() => {
-    mainWindow?.show();
-    mainWindow?.focus();
-  }).catch((err) => {
+  loadPromise.catch((err) => {
     console.error('[main] Failed to load renderer:', err);
   });
 }

@@ -1,14 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import PanelGrid from './components/PanelGrid';
-import SettingsPanel from './components/SettingsPanel';
 import { useLayoutStore } from './store';
+
+const SettingsPanel = lazy(() => import('./components/SettingsPanel'));
 
 export default function App() {
   const setSettings = useLayoutStore((s) => s.setSettings);
   const panels = useLayoutStore((s) => s.panels);
   const [showSettings, setShowSettings] = useState(false);
+  const [hasOpenedSettings, setHasOpenedSettings] = useState(false);
 
   useEffect(() => {
+    const seed = window.__INITIAL_SETTINGS__;
+    if (seed) {
+      setSettings(seed);
+      return;
+    }
     window.api.getSettings().then(setSettings).catch((err: unknown) => {
       console.error('[renderer] Failed to load settings:', err);
     });
@@ -31,7 +38,7 @@ export default function App() {
     <div className="h-screen flex flex-col bg-gray-900 relative">
       <PanelGrid />
       <button
-        onClick={() => setShowSettings((v) => !v)}
+        onClick={() => { setShowSettings(v => !v); if (!hasOpenedSettings) setHasOpenedSettings(true); }}
         className="absolute top-2 right-2 z-50 flex items-center px-2 h-8 text-gray-400 text-sm select-none"
       >
         <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-gray-800 hover:bg-gray-700 hover:text-white">
@@ -47,7 +54,11 @@ export default function App() {
           className={`absolute top-0 right-0 w-96 h-full bg-gray-800 border-l border-gray-700 rounded-l-xl transition-transform duration-300 ease-out ${showSettings ? 'translate-x-0' : 'translate-x-full'}`}
           onClick={(e) => e.stopPropagation()}
         >
-          <SettingsPanel />
+          {hasOpenedSettings && (
+            <Suspense fallback={null}>
+              <SettingsPanel />
+            </Suspense>
+          )}
         </div>
       </div>
     </div>

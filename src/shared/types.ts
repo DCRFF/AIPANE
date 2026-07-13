@@ -42,5 +42,6 @@ export interface BrowserApi {
 declare global {
   interface Window {
     api: BrowserApi;
+    __INITIAL_SETTINGS__?: AppSettings;
   }
 }

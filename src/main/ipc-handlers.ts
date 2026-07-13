@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow } from 'electron';
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import { loadSettings, saveSettings, loadWindowState, saveWindowState } from './store.js';
 import type { AppSettings, AIService } from '../shared/types.js';
 
@@ -31,7 +31,7 @@ export function setupGlobalIpc(): void {
   });
 
   ipcMain.handle('panel:add', (_event, url: string, name?: string) => {
-    const id = uuid();
+    const id = randomUUID();
     const panelName = name || `面板 ${settings.panels.length + 1}`;
     const newPanels = [...settings.panels, { id, name: panelName, url }];
     const panelRatios = newPanels.map(() => 1 / newPanels.length);
@@ -88,7 +88,7 @@ export function setupGlobalIpc(): void {
 
     try {
       const newService: AIService = {
-        id: uuid(),
+        id: randomUUID(),
         name: trimmedName,
         url: trimmedUrl,
         source: 'user',
@@ -159,6 +159,9 @@ export function setupGlobalIpc(): void {
 export function setupWindowEvents(mainWindow: BrowserWindow): void {
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('settings:init', settings);
+    mainWindow.webContents.executeJavaScript(
+      `window.__INITIAL_SETTINGS__ = ${JSON.stringify(settings)};`
+    );
   });
 
   mainWindow.on('close', () => {

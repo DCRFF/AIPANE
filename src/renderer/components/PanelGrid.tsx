@@ -14,15 +14,6 @@ export default function PanelGrid() {
   const layoutMode = useLayoutStore((s) => s.layoutMode);
   const panelOrder = useLayoutStore((s) => s.panelOrder);
 
-  const order =
-    panelOrder.length === panels.length
-      ? panelOrder
-      : panels.map((_, i) => i);
-
-  const validRatios =
-    panelRatios.length === panels.length
-      ? panelRatios
-      : panels.map(() => 1 / panels.length);
 
   // ── Grid dimensions ──
   const cols =
@@ -52,7 +43,7 @@ export default function PanelGrid() {
       return {
         display: 'grid',
         gap: 0,
-        gridTemplateColumns: trackStr(validRatios),
+        gridTemplateColumns: trackStr(panelRatios),
         gridTemplateRows: '1fr',
       };
     }
@@ -61,7 +52,7 @@ export default function PanelGrid() {
         display: 'grid',
         gap: 0,
         gridTemplateColumns: '1fr',
-        gridTemplateRows: trackStr(validRatios),
+        gridTemplateRows: trackStr(panelRatios),
       };
     }
     // grid: flat CSS grid, panels positioned via grid-column/grid-row
@@ -353,7 +344,7 @@ export default function PanelGrid() {
       const grip = e.currentTarget as HTMLElement;
       grip.setPointerCapture(e.pointerId);
 
-      const startRatios = [...validRatios];
+      const startRatios = [...panelRatios];
       const startPos = axis === 'x' ? e.clientX : e.clientY;
       const totalSize = axis === 'x' ? container.clientWidth : container.clientHeight;
       const pairSum = startRatios[index] + startRatios[index + 1];
@@ -402,7 +393,7 @@ export default function PanelGrid() {
       grip.addEventListener('pointermove', onMove);
       grip.addEventListener('pointerup', onUp);
     },
-    [validRatios, layoutMode, rowRatios],
+    [panelRatios, layoutMode, rowRatios],
   );
 
   // ── Needs padding for settings button ──
@@ -427,7 +418,7 @@ export default function PanelGrid() {
     >
       {/* Panels — always flat direct children */}
       {panels.map((panel, i) => {
-        const vp = order[i];
+        const vp = panelOrder[i];
         return (
           <div
             key={panel.id}

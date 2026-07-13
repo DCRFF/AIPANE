@@ -15,7 +15,12 @@ export const useLayoutStore = create<LayoutStore>((set) => ({
   rowRatios: [],
   panelOrder: [],
   aiServices: [],
-  setSettings: (settings) => set({ panels: settings.panels, layoutMode: settings.layoutMode, panelRatios: settings.panelRatios, rowRatios: settings.rowRatios ?? [], panelOrder: settings.panelOrder ?? [], aiServices: settings.aiServices ?? [] }),
+  setSettings: (settings) => {
+    const p = settings.panels;
+    const order = settings.panelOrder?.length === p.length ? settings.panelOrder : p.map((_, i) => i);
+    const ratios = settings.panelRatios?.length === p.length ? settings.panelRatios : p.map(() => 1 / p.length);
+    set({ panels: p, layoutMode: settings.layoutMode, panelRatios: ratios, rowRatios: settings.rowRatios ?? [], panelOrder: order, aiServices: settings.aiServices ?? [] });
+  },
   setRowRatios: (ratios) => set({ rowRatios: ratios }),
   setAiServices: (services) => set({ aiServices: services }),
 }));
